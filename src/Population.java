@@ -1,15 +1,15 @@
 import java.util.*;
 
 public class Population {
-    private final FireStation fireStation;
+    private final Mosaic mosaic;
     private final Random rand;
     private final List<Individual> population;
     private final int maxPopulationSize;
     private int populationSize;
     private final double elitismPct;
 
-    public Population(FireStation fireStation, Random rand, int maxPopulationSize, double elitismPct) {
-        this.fireStation = fireStation;
+    public Population(Mosaic mosaic, Random rand, int maxPopulationSize, double elitismPct) {
+        this.mosaic = mosaic;
         this.rand = rand;
         this.population = new ArrayList<>();
         this.maxPopulationSize = maxPopulationSize;
@@ -28,15 +28,16 @@ public class Population {
         return population.getFirst();
     }
 
+    // TODO : Sesuaikan populasi awal dengan puzzle mosaic
     public void initPopulation() {
-        List<Position> emptyPositions = fireStation.getEmptyPosition();
-        int fireStationCount = fireStation.getFireStationsCount();
+        List<Position> emptyPositions = mosaic.getEmptyPosition();
+        int mosaicCount = mosaic.getMosaicsCount();
 
         for (int i = 0; i < maxPopulationSize; i++) {
-            int[] chromosome = new int[fireStationCount];
+            int[] chromosome = new int[mosaicCount];
             Set<Integer> usedPositions = new HashSet<>();
 
-            for (int j = 0; j < fireStationCount; j++) {
+            for (int j = 0; j < mosaicCount; j++) {
                 int pickedIdx;
                 do {
                     pickedIdx = rand.nextInt(emptyPositions.size());
@@ -52,7 +53,7 @@ public class Population {
 
     public Population initPopulationWithElitism() {
         int elitismCount = (int) (maxPopulationSize * elitismPct);
-        Population nextPop = new Population(this.fireStation, this.rand, this.maxPopulationSize, this.elitismPct);
+        Population nextPop = new Population(this.mosaic, this.rand, this.maxPopulationSize, this.elitismPct);
         for (int i = 0; i < elitismCount; i++) {
             nextPop.addIndividual(population.get(i));
         }
@@ -65,29 +66,29 @@ public class Population {
     }
 
     public void evaluatePopulationCost() {
-        List<Position> emptyPositions = fireStation.getEmptyPosition();
+        List<Position> emptyPositions = mosaic.getEmptyPosition();
         for (Individual i : population) {
-            List<Position> fireStationPos = getFireStationPos(emptyPositions, i.getChromosome());
-            i.setCost(fireStation.getMinimumDistance(fireStationPos) / fireStation.getHouseCount());
+            List<Position> mosaicPos = getMosaicPos(emptyPositions, i.getChromosome());
+            i.setCost(mosaic.getMinimumDistance(mosaicPos) / mosaic.getHouseCount());
         }
     }
 
     public double getMeanPopulationCost() {
-        List<Position> emptyPositions = fireStation.getEmptyPosition();
+        List<Position> emptyPositions = mosaic.getEmptyPosition();
         double totalPopulationCost = 0;
         for (Individual i : population) {
-            List<Position> fireStationPos = getFireStationPos(emptyPositions, i.getChromosome());
-            totalPopulationCost += fireStation.getMinimumDistance(fireStationPos);
+            List<Position> mosaicPos = getMosaicPos(emptyPositions, i.getChromosome());
+            totalPopulationCost += mosaic.getMinimumDistance(mosaicPos);
         }
         return totalPopulationCost /  populationSize;
     }
 
-    private List<Position> getFireStationPos(List<Position> emptyPositions, int[] chromosome) {
-        List<Position> fireStationPos = new ArrayList<>();
+    private List<Position> getMosaicPos(List<Position> emptyPositions, int[] chromosome) {
+        List<Position> mosaicPos = new ArrayList<>();
         for (int alel : chromosome) {
-            fireStationPos.add(emptyPositions.get(alel));
+            mosaicPos.add(emptyPositions.get(alel));
         }
-        return fireStationPos;
+        return mosaicPos;
     }
 
     /*

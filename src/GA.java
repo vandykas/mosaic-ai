@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class GA {
-    private final FireStation fireStation;
+    private final Mosaic mosaic;
     private final Random rand;
     private final int totalGeneration;
     private final int maxPopulationSize;
@@ -11,8 +11,8 @@ public class GA {
     private final double convergenceThreshold;
     private final int convergenceWindow;
 
-    public GA(FireStation fireStation, int totalGeneration, int maxPopulationSize, double mutationRate, double crossOverRate, double elitismPct, Random rand, int convergenceWindow, double convergenceThreshold) {
-        this.fireStation = fireStation;
+    public GA(Mosaic mosaic, int totalGeneration, int maxPopulationSize, double mutationRate, double crossOverRate, double elitismPct, Random rand, int convergenceWindow, double convergenceThreshold) {
+        this.mosaic = mosaic;
         this.totalGeneration = totalGeneration;
         this.maxPopulationSize = maxPopulationSize;
         this.mutationRate = mutationRate;
@@ -24,7 +24,7 @@ public class GA {
     }
 
     public Individual runGenAlgo() {
-        Population population = new Population(fireStation, rand, maxPopulationSize, elitismPct);
+        Population population = new Population(mosaic, rand, maxPopulationSize, elitismPct);
         population.initPopulation();
         population.evaluatePopulationCost();
         population.sortPopulation();
@@ -44,12 +44,13 @@ public class GA {
                     Individual[] children = parent1.crossover(parent2);
 
                     // Coba mutasi kedua anak
-                    children[0].mutate(fireStation.getEmptyPosition(), mutationRate);
-                    children[1].mutate(fireStation.getEmptyPosition(), mutationRate);
+                    children[0].mutate(mosaic.getEmptyPosition(), mutationRate);
+                    children[1].mutate(mosaic.getEmptyPosition(), mutationRate);
 
                     // Perbaiki kromosom karena bisa terjadi duplikat akibat kawin silang
-                    children[0].repairChromosome(fireStation.getFireStationsCount());
-                    children[1].repairChromosome(fireStation.getFireStationsCount());
+                    // TODO : Sesuaikan dengan puzzle mosaic
+                    children[0].repairChromosome(mosaic.getMosaicsCount());
+                    children[1].repairChromosome(mosaic.getMosaicsCount());
 
                     nextPop.addIndividual(children[0]);
                     if (nextPop.getPopulationSize() < maxPopulationSize) {
