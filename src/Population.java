@@ -28,27 +28,8 @@ public class Population {
         return population.getFirst();
     }
 
-    // TODO : Sesuaikan populasi awal dengan puzzle mosaic
     public void initPopulation() {
-        List<Position> emptyPositions = mosaic.getEmptyPosition();
-        int mosaicCount = mosaic.getMosaicsCount();
-
-        for (int i = 0; i < maxPopulationSize; i++) {
-            int[] chromosome = new int[mosaicCount];
-            Set<Integer> usedPositions = new HashSet<>();
-
-            for (int j = 0; j < mosaicCount; j++) {
-                int pickedIdx;
-                do {
-                    pickedIdx = rand.nextInt(emptyPositions.size());
-                }
-                while (usedPositions.contains(pickedIdx));
-                usedPositions.add(pickedIdx);
-                chromosome[j] = pickedIdx;
-            }
-
-            population.add(new Individual(rand, chromosome));
-        }
+        // TODO : Sesuaikan populasi awal dengan puzzle mosaic
     }
 
     public Population initPopulationWithElitism() {

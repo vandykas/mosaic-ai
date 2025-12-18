@@ -11,7 +11,7 @@ public class MainGA {
         }
 
         File param = new File(args[0]);
-        File grid = new File(args[1]);
+        File puzzle = new File(args[1]);
         try {
             Scanner sc = new Scanner(param);
             int totalGeneration = sc.nextInt();
@@ -22,29 +22,22 @@ public class MainGA {
             int convergence_window = sc.nextInt();
             double convergence_treshold = sc.nextDouble();
 
-            // TODO : Sesuaikan input dengan puzzle mosaic
-            sc = new Scanner(grid);
-            int m = sc.nextInt();
+            sc = new Scanner(puzzle);
             int n = sc.nextInt();
-            int fireStationsCount = sc.nextInt();
-            int houseCount = sc.nextInt();
-            int treeCount = sc.nextInt();
+            int m = sc.nextInt();
+            Integer[][] grid = new Integer[n][m];
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < m; j++) {
+                    grid[i][j] = sc.nextInt();
+                }
+            }
 
-            Mosaic fireStation = new Mosaic(m, n, fireStationsCount);
-            fillCell(sc, fireStation, true, houseCount);
-            fillCell(sc, fireStation, false, treeCount);
+            Mosaic fireStation = new Mosaic(m, n, grid);
             doGenAlgo(fireStation, totalGeneration, maxPopulationSize, crossoverRate, mutationRate, elitismPct, convergence_window, convergence_treshold);
         }
         catch (FileNotFoundException e) {
             System.out.println("File " + args[0] + " not found!");
         }
-    }
-
-    /*
-    Mengisi grid dengan input yang diberikan
-     */
-    public static void fillCell(Scanner sc, Mosaic fireStation, boolean isFillHouse, int size) {
-        // TODO : Sesuaikan dengan puzzle mosaic
     }
 
     /*
@@ -56,6 +49,5 @@ public class MainGA {
         Individual result = myGeneticAlgo.runGenAlgo();
         result.printResult(fireStation.getEmptyPosition());
     }
-
 }
 
