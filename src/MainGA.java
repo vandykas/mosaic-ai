@@ -32,8 +32,8 @@ public class MainGA {
                 }
             }
 
-            Mosaic fireStation = new Mosaic(m, n, grid);
-            doGenAlgo(fireStation, totalGeneration, maxPopulationSize, crossoverRate, mutationRate, elitismPct, convergence_window, convergence_treshold);
+            Mosaic mosaic = new Mosaic(m, n, grid);
+            doGenAlgo(mosaic, totalGeneration, maxPopulationSize, crossoverRate, mutationRate, elitismPct, convergence_window, convergence_treshold);
         }
         catch (FileNotFoundException e) {
             System.out.println("File " + args[0] + " not found!");
