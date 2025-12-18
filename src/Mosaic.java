@@ -1,32 +1,37 @@
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.HashMap;
 
 public class Mosaic {
-    private final CellStatus[][] grid;
-    private List<Position> emptyPositions;
+    private final HashMap<Position, Boolean> fixedColor;
+    private final HashMap<Position, Integer> posToIdx;
+    private final Integer[][] grid;
+    private final ArrayList<NumCell> numberCell;
     private final int rowSize;
     private final int columnSize;
 
-    /*
-    NUMBER : Cell yang berisi angka dari input menandakan banyak kotak hitam di kotak 9 x 9 sekitar angka
-    BLACK : Cell yang berisi kotak hitam
-    EMPTY : Cell kosong (atau putih jika pada puzzle di websitenya) yang bukanlah kotak hitam dan juga tidak berisi angka
-     */
-    enum CellStatus {
-        NUMBER,
-        BLACK,
-        EMPTY
+    private static class NumCell {
+        Position position;
+        Integer value;
+
+        public NumCell(Position position, Integer value) {
+            this.position = position;
+            this.value = value;
+        }
     }
 
-    public Mosaic(int rowSize, int columnSize) {
+    public Mosaic(int rowSize, int columnSize, Integer[][] grid) {
         this.rowSize = rowSize;
         this.columnSize = columnSize;
-        this.grid = new CellStatus[rowSize][columnSize];
+        this.grid = grid;
+        this.fixedColor = new HashMap<>();
+        this.posToIdx = new HashMap<>();
+
+        this.numberCell = new ArrayList<>();
         for (int i = 0; i < rowSize; i++) {
             for (int j = 0; j < columnSize; j++) {
-                grid[i][j] =  CellStatus.EMPTY;
+                if (grid[i][j] != -1) {
+                    numberCell.add(new NumCell(new Position(i, j), grid[i][j]));
+                }
             }
         }
     }
@@ -39,44 +44,42 @@ public class Mosaic {
         return columnSize;
     }
 
-    public List<Position> getEmptyPosition() {
-        if (emptyPositions == null) {
-            this.emptyPositions = new ArrayList<>();
-            for (int i = 0; i < rowSize; i++) {
-                for (int j = 0; j < columnSize; j++) {
-                    if (isEmpty(i, j)) {
-                        emptyPositions.add(new Position(i, j));
-                    }
-                }
-            }
-        }
-        return this.emptyPositions;
-    }
-    public boolean isEmpty(int x, int y) {
-        return grid[x][y] == CellStatus.EMPTY;
-    }
-
     public boolean isInTheGrid(int x, int y) {
         return x >= 0 && x < rowSize && y >= 0 && y < columnSize;
     }
 
-    static class Node {
-        Position pos;
-        int dist;
+    public void heuristic() {
+        // TODO : Membuat heuristik untuk mosaic agar ukuran chromosome mengecil
+    }
 
-        public Node(Position pos, int dist) {
-            this.pos = pos;
-            this.dist = dist;
+    public double fitnessFunction(boolean[] chromosome) {
+        // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
+        int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
+        int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+
+        int fitness = 0;
+        for (NumCell numCell : numberCell) {
+            int curRow = numCell.position.getX(), curCol = numCell.position.getY();
+            int blackCnt = 0;
+            for (int j = 0; j < moveRow.length; j++) {
+                int newRow = moveRow[j] + curRow;
+                int newCol = moveCol[j] + curCol;
+                if (isInTheGrid(newRow, newCol)) {
+                    Position position = new Position(newRow, newCol);
+                    if (isBlack(position, chromosome)) {
+                        blackCnt++;
+                    }
+                }
+            }
+            fitness += Math.abs(numCell.value - blackCnt);
         }
+        return 1.0 / fitness;
     }
 
-    public double getMinimumDistance(List<Position> fireStationPos) {
-        // TODO : Membuat fitness function
-        return 0;
-    }
-
-    private double bfs(Queue<Node> queue, boolean[][] visited) {
-        // TODO : Membuat fitness function
-        return 0;
+    private boolean isBlack(Position p, boolean[] chromosome) {
+        if (fixedColor.containsKey(p)) {
+            return fixedColor.get(p);
+        }
+        return chromosome[posToIdx.get(p)];
     }
 }
