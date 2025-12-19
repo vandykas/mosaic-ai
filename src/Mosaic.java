@@ -2,6 +2,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Mosaic {
+    /*
+    FixedColor berisi posisi cell yang sudah berisi warna fixed dan
+    warna ini didapat dari heuristik
+    PosToIdx untuk mentranslasi posisi 2D ke posisi 1D karena gene hanya
+    menyimpan cell yang warnanya belum fixed
+     */
     private final HashMap<Position, Boolean> fixedColor;
     private final HashMap<Position, Integer> posToIdx;
     private final Integer[][] grid;
@@ -73,7 +79,7 @@ public class Mosaic {
             }
             fitness += Math.abs(numCell.value - blackCnt);
         }
-        return 1.0 / fitness;
+        return 1.0 / (1 + fitness);
     }
 
     private boolean isBlack(Position p, boolean[] chromosome) {
