@@ -143,8 +143,7 @@ public class Individu {
      */
     public void hitungFitness(Mosaic mosaic) {
         int[][] grid = toGrid2D();
-        int totalDeviasi = mosaic.hitungDeviasi(grid);
-        this.fitness = -totalDeviasi; // Fitness = -deviasi
+        this.fitness = mosaic.fitnessFunction(grid); // Fitness = -deviasi
     }
     
     /**
