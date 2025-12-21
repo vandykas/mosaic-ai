@@ -41,25 +41,14 @@ public class Mosaic {
         }
     }
 
-    /**
-     * Menghitung deviasi total dari solusi yang diberikan
-     * @param gridSolusi Grid solusi (0=putih, 1=hitam)
-     * @return Total deviasi dari semua clue
-     */
-    public int hitungDeviasi(int[][] gridSolusi) {
-        int totalDeviasi = 0;
-
-        for (int i = 0; i < ukuran; i++) {
-            for (int j = 0; j < ukuran; j++) {
-                if (clue[i][j] != -1) { // Sel memiliki clue
-                    int hitungHitam = hitungSelHitamSekitar(gridSolusi, i, j);
-                    int deviasi = Math.abs(hitungHitam - clue[i][j]);
-                    totalDeviasi += deviasi;
-                }
-            }
+    public int fitnessFunction(int[][] gridSolusi) {
+        int fitness = 0;
+        for (NumCell numCell : numberCell) {
+            int curRow = numCell.row, curCol = numCell.col;
+            int blackCnt = hitungSelHitamSekitar(gridSolusi, curRow, curCol);
+            fitness += Math.abs(numCell.value - blackCnt);
         }
-
-        return totalDeviasi;
+        return -fitness;
     }
 
     /**
@@ -70,16 +59,18 @@ public class Mosaic {
      * @return Jumlah sel hitam di sekitarnya
      */
     private int hitungSelHitamSekitar(int[][] grid, int baris, int kolom) {
-        int hitung = 0;
+        // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
+        int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
+        int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
 
-        for (int i = Math.max(0, baris - 1); i <= Math.min(ukuran - 1, baris + 1); i++) {
-            for (int j = Math.max(0, kolom - 1); j <= Math.min(ukuran - 1, kolom + 1); j++) {
-                if (grid[i][j] == 1) {
-                    hitung++;
-                }
+        int hitung = 0;
+        for (int i = 0; i < moveRow.length; i++) {
+            int newRow = baris + moveRow[i];
+            int newCol = kolom + moveCol[i];
+            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == 1) {
+                hitung++;
             }
         }
-
         return hitung;
     }
 
@@ -93,29 +84,5 @@ public class Mosaic {
 
     public boolean isInTheGrid(int x, int y) {
         return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
-    }
-
-    public void heuristic() {
-        // TODO : Membuat heuristik untuk mosaic agar ukuran chromosome mengecil
-    }
-
-    public double fitnessFunction(List<Integer> chromosome) {
-        // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
-        int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
-        int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
-
-        int fitness = 0;
-        for (NumCell numCell : numberCell) {
-            int curRow = numCell.row, curCol = numCell.col;
-            int blackCnt = 0;
-            for (int j = 0; j < moveRow.length; j++) {
-                int idxToCheck = curRow * ukuran + curCol;
-                if (chromosome.contains(idxToCheck)) {
-                    blackCnt++;
-                }
-            }
-            fitness += Math.abs(numCell.value - blackCnt);
-        }
-        return 1.0 / (1 + fitness);
     }
 }
