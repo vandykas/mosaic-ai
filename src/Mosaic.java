@@ -1,6 +1,10 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Mosaic {
     private int ukuran;
     private int[][] clue;
+    private List<NumCell> numberCell;
 
     /**
      * Konstruktor untuk membuat objek Mosaic
@@ -14,14 +18,25 @@ public class Mosaic {
         for (int i = 0; i < ukuran; i++) {
             System.arraycopy(clue[i], 0, this.clue[i], 0, ukuran);
         }
+
+        this.numberCell = new ArrayList<NumCell>();
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                if (clue[i][j] != -1) {
+                    numberCell.add(new NumCell(i, j, clue[i][j]));
+                }
+            }
+        }
     }
 
     private static class NumCell {
-        Position position;
+        int row;
+        int col;
         Integer value;
 
-        public NumCell(Position position, Integer value) {
-            this.position = position;
+        public NumCell(int row, int col, Integer value) {
+            this.row = row;
+            this.col = col;
             this.value = value;
         }
     }
@@ -84,34 +99,23 @@ public class Mosaic {
         // TODO : Membuat heuristik untuk mosaic agar ukuran chromosome mengecil
     }
 
-    public double fitnessFunction(boolean[] chromosome) {
+    public double fitnessFunction(List<Integer> chromosome) {
         // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
         int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
         int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
 
         int fitness = 0;
         for (NumCell numCell : numberCell) {
-            int curRow = numCell.position.getX(), curCol = numCell.position.getY();
+            int curRow = numCell.row, curCol = numCell.col;
             int blackCnt = 0;
             for (int j = 0; j < moveRow.length; j++) {
-                int newRow = moveRow[j] + curRow;
-                int newCol = moveCol[j] + curCol;
-                if (isInTheGrid(newRow, newCol)) {
-                    Position position = new Position(newRow, newCol);
-                    if (isBlack(position, chromosome)) {
-                        blackCnt++;
-                    }
+                int idxToCheck = curRow * ukuran + curCol;
+                if (chromosome.contains(idxToCheck)) {
+                    blackCnt++;
                 }
             }
             fitness += Math.abs(numCell.value - blackCnt);
         }
         return 1.0 / (1 + fitness);
-    }
-
-    private boolean isBlack(Position p, boolean[] chromosome) {
-        if (fixedColor.containsKey(p)) {
-            return fixedColor.get(p);
-        }
-        return chromosome[posToIdx.get(p)];
     }
 }
