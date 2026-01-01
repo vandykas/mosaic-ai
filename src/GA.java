@@ -22,7 +22,7 @@ public class GA {
      * Konstruktor algoritma genetika
      */
     public GA(Mosaic mosaic, int populasi, double mutation_rate, 
-              double elitism_rate, int max_generation, double convergence_treshold,
+              double elitism_rate, int max_generation, double convergence_threshold,
               int convergence_window, int seed) {
         
         this.mosaic = mosaic;
@@ -30,7 +30,7 @@ public class GA {
         this.mutation_rate = mutation_rate;
         this.elitism_rate = elitism_rate;
         this.max_generation = max_generation;
-        this.convergence_treshold = convergence_treshold;
+        this.convergence_treshold = convergence_threshold;
         this.convergence_window = convergence_window;
         this.random = new Random(seed);
         this.riwayatFitnessPopulasi = new ArrayList<>();
@@ -40,7 +40,7 @@ public class GA {
             populasi, mosaic.getUkuran(), mosaic, random);
         this.individuTerbaik = populasiSaatIni.getIndividuTerbaik().salin();
     }
-    
+
     /**
      * Menjalankan algoritma genetika
      */

@@ -8,11 +8,11 @@ import java.util.Random;
  * Kelas untuk merepresentasikan populasi dari individu-individu
  */
 public class Populasi {
+    private final Mosaic mosaic;
+    private final Random random;
     private List<Individu> daftarIndividu;
     private double fitnessRataRata;
-    private Mosaic mosaic;
-    private Random random;
-    
+
     /**
      * Konstruktor untuk membuat populasi baru
      * @param populasi Jumlah individu dalam populasi

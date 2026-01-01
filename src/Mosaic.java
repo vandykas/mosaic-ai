@@ -4,7 +4,11 @@ import java.util.List;
 public class Mosaic {
     private int ukuran;
     private int[][] clue;
+    private int[][] partialSolution;
     private List<NumCell> numberCell;
+
+    private final int[] MOVEROW = {0, -1, -1, 0, 1, 1, 1, 0, -1};
+    private final int[] MOVECOL = {0, 0, 1, 1, 1, 0, -1, -1, -1};
 
     /**
      * Konstruktor untuk membuat objek Mosaic
@@ -18,6 +22,8 @@ public class Mosaic {
         for (int i = 0; i < ukuran; i++) {
             System.arraycopy(clue[i], 0, this.clue[i], 0, ukuran);
         }
+
+        this.partialSolution = new int[ukuran][ukuran];
 
         this.numberCell = new ArrayList<NumCell>();
         for (int i = 0; i < ukuran; i++) {
@@ -38,6 +44,76 @@ public class Mosaic {
             this.row = row;
             this.col = col;
             this.value = value;
+        }
+    }
+
+    private void heuristic() {
+        boolean isChanged = true;
+
+        while (isChanged) {
+            isChanged = false;
+
+            for (int row = 0; row < ukuran; row++) {
+                for (int col = 0; col < ukuran; col++) {
+                    int curClue = clue[row][col];
+                    if (curClue >= 0) {
+                        isChanged = (isChanged || checkClue(row, col, curClue));
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean checkClue(int row, int col, int curClue) {
+        /*
+        0 = tidak diketahui
+        1 = putih
+        2 = hitam
+         */
+        int[] colorCount = new int[3];
+        for (int i = 0; i < MOVEROW.length; i++) {
+            int newRow = MOVEROW[i] + row;
+            int newCol = MOVECOL[i] + col;
+            if (!isInTheGrid(newRow, newCol)) {
+                continue;
+            }
+            colorCount[partialSolution[newRow][newCol]]++;
+        }
+
+        int remainingBlack = curClue - colorCount[2];
+
+        // Ubah semua ke hitam
+        if (canFilledWithBlack(remainingBlack, colorCount[0])) {
+            changeNeigbourColor(row, col, 2);
+            return true;
+        }
+        // Ubah semua ke putih
+        else if (canFilledWithWhite(remainingBlack, colorCount[0])) {
+            changeNeigbourColor(row, col, 1);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean canFilledWithBlack(int remainingBlack, int unknown) {
+        return remainingBlack == unknown && unknown > 0;
+    }
+
+    private boolean canFilledWithWhite(int remainingBlack, int unknown) {
+        return remainingBlack == 0 && unknown > 0;
+    }
+
+    private void changeNeigbourColor(int row, int col, int color) {
+        for (int i = 0; i < MOVEROW.length; i++) {
+            int newRow = MOVEROW[i] + row;
+            int newCol = MOVECOL[i] + col;
+            if (!isInTheGrid(newRow, newCol)) {
+                continue;
+            }
+
+            if (partialSolution[newRow][newCol] == 0) {
+                partialSolution[newRow][newCol] = color;
+            }
         }
     }
 
@@ -86,3 +162,4 @@ public class Mosaic {
         return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
     }
 }
+
