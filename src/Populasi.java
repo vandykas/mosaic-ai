@@ -8,7 +8,7 @@ public class Populasi {
     private final Mosaic mosaic;
     private final Random random;
     private final int populationSize;
-    private List<Individu> daftarIndividu;
+    private final List<Individu> daftarIndividu;
     private double fitnessRataRata;
 
     public Populasi(int populationSize, Mosaic mosaic, Random random) {
@@ -35,50 +35,41 @@ public class Populasi {
     }
     
     public void sortPopulation() {
-        Collections.sort(daftarIndividu, Collections.reverseOrder());
+        daftarIndividu.sort(Collections.reverseOrder());
     }
     
     public Individu seleksiRoulette() {
-        double fitnessMin = Collections.min(daftarIndividu,
-            Comparator.comparingDouble(Individu::getFitness)).getFitness();
-        double offset = fitnessMin < 0 ? -fitnessMin + 1 : 1;
-        
         double totalFitness = 0;
         for (Individu individu : daftarIndividu) {
-            totalFitness += (individu.getFitness() + offset);
+            totalFitness += individu.getFitness();
         }
         
-        // Putaran roulette
         double roda = random.nextDouble() * totalFitness;
         double total = 0;
         
         for (Individu individu : daftarIndividu) {
-            total += (individu.getFitness() + offset);
+            total += individu.getFitness();
             if (total >= roda) {
                 return individu;
             }
         }
-        
-        // Fallback: kembalikan individu pertama
         return daftarIndividu.get(0);
     }
     
     public Individu seleksiRank() {
-        urutkanBerdasarkanFitness();
         int n = daftarIndividu.size();
         
-        // Probabilitas berdasarkan rank (individu terbaik rank tertinggi)
         double totalRank = n * (n + 1) / 2.0;
         double roda = random.nextDouble() * totalRank;
+
         double total = 0;
-        
         for (int i = 0; i < n; i++) {
-            total += (i + 1); // Rank dimulai dari 1
+            int rank = n - i;
+            total += rank;
             if (total >= roda) {
                 return daftarIndividu.get(i);
             }
         }
-        
         return daftarIndividu.get(0);
     }
     
@@ -95,7 +86,6 @@ public class Populasi {
                 terbaik = kandidat;
             }
         }
-        
         return terbaik;
     }
     

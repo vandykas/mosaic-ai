@@ -136,14 +136,14 @@ public class Mosaic {
         }
     }
 
-    public int fitnessFunction(boolean[] kromosom) {
+    public double fitnessFunction(boolean[] kromosom) {
         int[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
         for (NumCell cell : numberCell) {
             int blackCnt = hitungSelHitamSekitar(gridSolusi, cell.row, cell.col);
             fitness += Math.abs(cell.value - blackCnt);
         }
-        return -fitness;
+        return 1.0 / (fitness + 1);
     }
 
     private int[][] makeSolutionGrid(boolean[] kromosom) {

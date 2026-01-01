@@ -6,22 +6,19 @@ import java.util.Random;
  * Kelas utama algoritma genetika
  */
 public class GA {
-    private Mosaic mosaic;
-    private int populasi;
-    private double mutation_rate;
-    private double elitism_rate;
-    private int max_generation;
-    private double convergence_treshold;
-    private int convergence_window;
-    private Random random;
+    private final Mosaic mosaic;
+    private final Random random;
+    private final int populasi;
+    private final double mutation_rate;
+    private final double elitism_rate;
+    private final int max_generation;
+    private final double convergence_treshold;
+    private final int convergence_window;
     private Populasi populasiSaatIni;
     private Individu individuTerbaik;
     private List<Double> riwayatFitnessPopulasi;
     
-    /**
-     * Konstruktor algoritma genetika
-     */
-    public GA(Mosaic mosaic, int populasi, double mutation_rate, 
+    public GA(Mosaic mosaic, int populasi, double mutation_rate,
               double elitism_rate, int max_generation, double convergence_threshold,
               int convergence_window, int seed) {
         
@@ -89,10 +86,6 @@ public class GA {
         System.out.println("Fitness terbaik: " + individuTerbaik.getFitness());
     }
     
-    /**
-     * Membuat generasi baru dari populasi saat ini
-     * @return Populasi baru
-     */
     private Populasi buatGenerasiBaru() {
         List<Individu> generasiBaru = new ArrayList<>();
         
@@ -129,10 +122,6 @@ public class GA {
         };
     }
     
-    /**
-     * Mengecek apakah populasi telah konvergen
-     * @return true jika sudah konvergen
-     */
     private boolean cekKonvergensi() {
         if (riwayatFitnessPopulasi.size() < convergence_window) {
             return false;
@@ -160,9 +149,5 @@ public class GA {
     
     public Individu getIndividuTerbaik() {
         return individuTerbaik;
-    }
-    
-    public Populasi getPopulasiSaatIni() {
-        return populasiSaatIni;
     }
 }

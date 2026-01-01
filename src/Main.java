@@ -1,9 +1,6 @@
 import java.io.*;
 import java.util.*;
 
-/**
- * Kelas utama untuk menjalankan algoritma genetika pada puzzle Mosaic
- */
 public class Main {
     public static void main(String[] args) {
         if (args.length < 2) {

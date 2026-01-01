@@ -5,7 +5,7 @@ public class Individu implements Comparable<Individu> {
     private Random random;
     private Mosaic mosaic;
     private boolean[] kromosom;
-    private int fitness;
+    private double fitness;
 
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
         this.random = random;
@@ -23,14 +23,14 @@ public class Individu implements Comparable<Individu> {
 
     @Override
     public int compareTo(Individu o) {
-        return Integer.compare(this.fitness, o.fitness);
+        return Double.compare(this.fitness, o.fitness);
     }
 
     public boolean[] getKromosom() {
         return this.kromosom;
     }
 
-    public int getFitness() {
+    public double getFitness() {
         return fitness;
     }
 
