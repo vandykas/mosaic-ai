@@ -7,15 +7,20 @@ import java.util.Random;
 public class Populasi {
     private final Mosaic mosaic;
     private final Random random;
-    private final int populationSize;
+    private final int maxPopulationSize;
     private final List<Individu> daftarIndividu;
+    private int populationSize;
     private double fitnessRataRata;
 
-    public Populasi(int populationSize, Mosaic mosaic, Random random) {
+    public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
         this.random = random;
-        this.populationSize = populationSize;
+        this.maxPopulationSize = maxPopulationSize;
         this.daftarIndividu = new ArrayList<>();
+    }
+
+    public int getPopulationSize() {
+        return populationSize;
     }
 
     public void initPopulasi() {
@@ -25,7 +30,21 @@ public class Populasi {
             daftarIndividu.add(individu);
         }
     }
-    
+
+    public Populasi initPopulasiWithElitism(double elitismRate) {
+        int elitismCount = (int) (maxPopulationSize * elitismRate);
+        Populasi nextPop = new Populasi(maxPopulationSize, mosaic, random);
+        for (int i = 0; i < elitismCount; i++) {
+            nextPop.addIndividu(daftarIndividu.get(i));
+        }
+        return nextPop;
+    }
+
+    public void addIndividu(Individu individu) {
+        this.daftarIndividu.add(individu);
+        this.populationSize++;
+    }
+
     public void hitungFitnessRataRata() {
         double total = 0;
         for (Individu individu : daftarIndividu) {

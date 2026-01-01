@@ -8,22 +8,21 @@ import java.util.Random;
 public class GA {
     private final Mosaic mosaic;
     private final Random random;
-    private final int populasi;
+    private final int maxPopulationSize;
     private final double mutation_rate;
     private final double elitism_rate;
     private final int max_generation;
     private final double convergence_treshold;
     private final int convergence_window;
-    private Populasi populasiSaatIni;
     private Individu individuTerbaik;
     private List<Double> riwayatFitnessPopulasi;
     
-    public GA(Mosaic mosaic, int populasi, double mutation_rate,
+    public GA(Mosaic mosaic, int maxPopulationSize, double mutation_rate,
               double elitism_rate, int max_generation, double convergence_threshold,
               int convergence_window, int seed) {
         
         this.mosaic = mosaic;
-        this.populasi = populasi;
+        this.maxPopulationSize = populasi;
         this.mutation_rate = mutation_rate;
         this.elitism_rate = elitism_rate;
         this.max_generation = max_generation;
@@ -31,95 +30,67 @@ public class GA {
         this.convergence_window = convergence_window;
         this.random = new Random(seed);
         this.riwayatFitnessPopulasi = new ArrayList<>();
-        
-        // Inisialisasi populasi awal
-        this.populasiSaatIni = new Populasi(
-            populasi, mosaic.getUkuran(), mosaic, random);
-        this.individuTerbaik = populasiSaatIni.getIndividuTerbaik().salin();
     }
 
-    /**
-     * Menjalankan algoritma genetika
-     */
     public void jalankan() {
+        Populasi currPopulation = initPopulasi();
+        individuTerbaik = currPopulation.getIndividuTerbaik();
+
         int generasi = 0;
         boolean konvergen = false;
-        
         while (generasi < max_generation && !konvergen) {
-            // Buat generasi baru
-            Populasi generasiBaru = buatGenerasiBaru();
+            Populasi nextPopulation = buatGenerasiBaru();
             
-            // Ganti populasi lama dengan yang baru
-            populasiSaatIni.gantiPopulasi(generasiBaru.getDaftarIndividu());
-            
-            // Update individu terbaik
-            Individu terbaikSaatIni = populasiSaatIni.getIndividuTerbaik();
+            Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
             if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
-                individuTerbaik = terbaikSaatIni.salin();
+                individuTerbaik = terbaikSaatIni;
             }
             
-            // Simpan fitness rata-rata populasi untuk pengecekan konvergensi
-            riwayatFitnessPopulasi.add(populasiSaatIni.getFitnessRataRata());
-            
-            // Cek konvergensi
+            riwayatFitnessPopulasi.add(nextPopulation.getFitnessRataRata());
             if (generasi >= convergence_window) {
                 konvergen = cekKonvergensi();
             }
             
-            // Cetak progress setiap 1000 generasi
             if (generasi % 1000 == 0) {
-                System.out.println("Generasi " + generasi + 
+                System.out.println("Generasi " + generasi +
                     " - Fitness terbaik: " + individuTerbaik.getFitness() +
-                    " - Rata-rata: " + populasiSaatIni.getFitnessRataRata());
+                    " - Rata-rata: " + nextPopulation.getFitnessRataRata());
             }
             
-            // Cek apakah solusi sempurna ditemukan
             if (individuTerbaik.getFitness() == 0) {
                 System.out.println("Solusi sempurna ditemukan pada generasi " + generasi);
                 break;
             }
-            
             generasi++;
         }
         
         System.out.println("Algoritma selesai. Generasi terakhir: " + generasi);
         System.out.println("Fitness terbaik: " + individuTerbaik.getFitness());
     }
+
+    private Populasi initPopulasi() {
+        Populasi population = new Populasi(maxPopulationSize, mosaic, random);
+        population.initPopulasi();
+        population.sortPopulation();
+        return population;
+    }
     
-    private Populasi buatGenerasiBaru() {
-        List<Individu> generasiBaru = new ArrayList<>();
-        
-        // Elitisme: ambil individu terbaik langsung ke generasi baru
-        int jumlahElit = (int) (populasi * elitism_rate);
-        populasiSaatIni.urutkanBerdasarkanFitness();
-        
-        for (int i = 0; i < jumlahElit; i++) {
-            generasiBaru.add(populasiSaatIni.getDaftarIndividu().get(i).salin());
-        }
-        
-        // Isi sisa populasi dengan crossover dan mutasi
-        while (generasiBaru.size() < populasi) {
-            // Pilih metode seleksi
-            Individu orangtua1 = populasiSaatIni.seleksiRoulette();
-            Individu orangtua2 = populasiSaatIni.seleksiRoulette();
-            
-            // Crossover
-            Individu anak = orangtua1.crossover(orangtua2);
-            
-            // Mutasi
-            anak.mutasi(mutation_rate);
-            
-            // Hitung fitness anak
-            anak.hitungFitness(mosaic);
-            
-            generasiBaru.add(anak);
-        }
-        
-        return new Populasi(populasi, mosaic.getUkuran(), mosaic, random) {
-            {
-                this.gantiPopulasi(generasiBaru);
+    private Populasi buatGenerasiBaru(Populasi currPopulation) {
+        Populasi nextPopulation = currPopulation.initPopulasiWithElitism(maxPopulationSize);
+        while (nextPopulation.getPopulationSize() < maxPopulationSize) {
+            Individu parent1 = currPopulation.seleksiRoulette();
+            Individu parent2 = currPopulation.seleksiRoulette();
+
+            Individu[] children = parent1.singlePointCrossover(parent2);
+            children[0].mutasi(mutation_rate);
+            children[1].mutasi(mutation_rate);
+
+            nextPopulation.addIndividu(children[0]);
+            if (nextPopulation.getPopulationSize() < maxPopulationSize) {
+                nextPopulation.addIndividu(children[1]);
             }
-        };
+        }
+        return nextPopulation;
     }
     
     private boolean cekKonvergensi() {
