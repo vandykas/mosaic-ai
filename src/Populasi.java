@@ -4,56 +4,28 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Kelas untuk merepresentasikan populasi dari individu-individu
- */
 public class Populasi {
     private final Mosaic mosaic;
     private final Random random;
+    private final int populationSize;
     private List<Individu> daftarIndividu;
     private double fitnessRataRata;
 
-    /**
-     * Konstruktor untuk membuat populasi baru
-     * @param populasi Jumlah individu dalam populasi
-     * @param ukuranGrid Ukuran grid puzzle
-     * @param mosaic Objek Mosaic
-     * @param random Generator acak
-     */
-    public Populasi(int populasi, int ukuranGrid, Mosaic mosaic, Random random) {
+    public Populasi(int populationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
         this.random = random;
+        this.populationSize = populationSize;
         this.daftarIndividu = new ArrayList<>();
-        
-        // Inisialisasi populasi dengan individu acak menggunakan heuristik
-        for (int i = 0; i < populasi; i++) {
-            Individu individu = new Individu(ukuranGrid, random, mosaic);
-            individu.hitungFitness(mosaic);
+    }
+
+    public void initPopulasi() {
+        for (int i = 0; i < populationSize; i++) {
+            Individu individu = new Individu(random, mosaic);
+            individu.hitungFitness();
             daftarIndividu.add(individu);
         }
-        
-        hitungFitnessRataRata();
-        urutkanBerdasarkanFitness();
     }
     
-    /**
-     * Konstruktor untuk membuat populasi dari daftar individu
-     * @param daftarIndividu Daftar individu
-     * @param mosaic Objek Mosaic
-     * @param random Generator acak
-     */
-    public Populasi(List<Individu> daftarIndividu, Mosaic mosaic, Random random) {
-        this.mosaic = mosaic;
-        this.random = random;
-        this.daftarIndividu = daftarIndividu;
-        
-        hitungFitnessRataRata();
-        urutkanBerdasarkanFitness();
-    }
-    
-    /**
-     * Menghitung fitness rata-rata populasi
-     */
     public void hitungFitnessRataRata() {
         double total = 0;
         for (Individu individu : daftarIndividu) {
@@ -62,25 +34,12 @@ public class Populasi {
         this.fitnessRataRata = total / daftarIndividu.size();
     }
     
-    /**
-     * Mengurutkan individu berdasarkan fitness (descending)
-     */
-    public void urutkanBerdasarkanFitness() {
-        Collections.sort(daftarIndividu, new Comparator<Individu>() {
-            @Override
-            public int compare(Individu i1, Individu i2) {
-                return Double.compare(i2.getFitness(), i1.getFitness());
-            }
-        });
+    public void sortPopulation() {
+        Collections.sort(daftarIndividu, Collections.reverseOrder());
     }
     
-    /**
-     * Seleksi orangtua menggunakan metode roulette wheel
-     * @return Individu terpilih
-     */
     public Individu seleksiRoulette() {
-        // Hitung total fitness (setelah normalisasi agar positif)
-        double fitnessMin = Collections.min(daftarIndividu, 
+        double fitnessMin = Collections.min(daftarIndividu,
             Comparator.comparingDouble(Individu::getFitness)).getFitness();
         double offset = fitnessMin < 0 ? -fitnessMin + 1 : 1;
         
@@ -104,10 +63,6 @@ public class Populasi {
         return daftarIndividu.get(0);
     }
     
-    /**
-     * Seleksi orangtua menggunakan metode rank
-     * @return Individu terpilih
-     */
     public Individu seleksiRank() {
         urutkanBerdasarkanFitness();
         int n = daftarIndividu.size();
@@ -127,11 +82,6 @@ public class Populasi {
         return daftarIndividu.get(0);
     }
     
-    /**
-     * Seleksi orangtua menggunakan metode tournament
-     * @param ukuranTurnamen Ukuran turnamen
-     * @return Individu terpilih
-     */
     public Individu seleksiTournament(int ukuranTurnamen) {
         Individu terbaik = null;
         double fitnessTerbaik = Double.NEGATIVE_INFINITY;
@@ -149,34 +99,15 @@ public class Populasi {
         return terbaik;
     }
     
-    /**
-     * Mengganti seluruh populasi dengan populasi baru
-     * @param populasiBaru Populasi baru
-     */
-    public void gantiPopulasi(List<Individu> populasiBaru) {
-        this.daftarIndividu = new ArrayList<>(populasiBaru);
-        hitungFitnessRataRata();
-        urutkanBerdasarkanFitness();
-    }
-    
-    /**
-     * Mendapatkan individu terbaik
-     * @return Individu dengan fitness tertinggi
-     */
     public Individu getIndividuTerbaik() {
         return daftarIndividu.get(0);
     }
-    
-    
+
     public List<Individu> getDaftarIndividu() {
         return daftarIndividu;
     }
     
     public double getFitnessRataRata() {
         return fitnessRataRata;
-    }
-    
-    public int getUkuran() {
-        return daftarIndividu.size();
     }
 }

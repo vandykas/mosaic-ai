@@ -1,11 +1,11 @@
 import java.util.Arrays;
 import java.util.Random;
 
-public class Individu {
+public class Individu implements Comparable<Individu> {
     private Random random;
     private Mosaic mosaic;
     private boolean[] kromosom;
-    private double fitness;
+    private int fitness;
 
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
         this.random = random;
@@ -21,11 +21,16 @@ public class Individu {
         initKromosom();
     }
 
+    @Override
+    public int compareTo(Individu o) {
+        return Integer.compare(this.fitness, o.fitness);
+    }
+
     public boolean[] getKromosom() {
         return this.kromosom;
     }
 
-    public double getFitness() {
+    public int getFitness() {
         return fitness;
     }
 
@@ -57,6 +62,28 @@ public class Individu {
         int crossoverPoint = random.nextInt(chromosomeLength);
 
         for (int i = crossoverPoint; i < chromosomeLength; i++) {
+            boolean temp = child1[i];
+            child1[i] = child2[i];
+            child2[i] = temp;
+        }
+
+        return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
+    }
+
+    public Individu[] doublePointCrossover(Individu pasangan) {
+        boolean[] child1 = kromosom.clone();
+        boolean[] child2 = pasangan.getKromosom().clone();
+
+        int chromosomeLength = kromosom.length;
+
+        int crossoverPoint1 = random.nextInt(chromosomeLength);
+        int crossoverPoint2;
+        do {
+            crossoverPoint2 = random.nextInt(chromosomeLength);
+        }
+        while (crossoverPoint1 == crossoverPoint2);
+
+        for (int i = Math.min(crossoverPoint1, crossoverPoint2); i < Math.max(crossoverPoint1, crossoverPoint2) ; i++) {
             boolean temp = child1[i];
             child1[i] = child2[i];
             child2[i] = temp;
