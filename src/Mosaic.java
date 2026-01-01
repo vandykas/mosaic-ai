@@ -1,12 +1,11 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class Mosaic {
-    private int ukuran;
-    private int[][] clue;
-    private int[][] partialSolution;
-    private List<NumCell> numberCell;
+    private final int ukuran;
+    private final int[][] clue;
+    private final int[][] partialSolution;
+    private final List<NumCell> numberCell;
     private List<Cell> unknownCells;
 
     // Pergerakan row dan col ke tetangga termasuk cell itu sendiri
@@ -31,6 +30,7 @@ public class Mosaic {
                 }
             }
         }
+        heuristic();
     }
 
     private static class Cell {
@@ -136,7 +136,7 @@ public class Mosaic {
         }
     }
 
-    public int fitnessFunction(int[] kromosom) {
+    public int fitnessFunction(boolean[] kromosom) {
         int[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
         for (NumCell cell : numberCell) {
@@ -146,14 +146,14 @@ public class Mosaic {
         return -fitness;
     }
 
-    private int[][] makeSolutionGrid(int[] kromosom) {
+    private int[][] makeSolutionGrid(boolean[] kromosom) {
         int[][] solutionGrid = new int[ukuran][ukuran];
 
         // Isi grid dari kromosom buatan GA
         for (int i = 0; i < kromosom.length; i++) {
             int row = unknownCells.get(i).row;
             int col = unknownCells.get(i).col;
-            solutionGrid[row][col] = kromosom[i];
+            solutionGrid[row][col] = kromosom[i] ? 2 : 1;
         }
 
         // Isi sisa grid dari warna fixed hasil heuristik
@@ -181,6 +181,10 @@ public class Mosaic {
 
     public int getUkuran() {
         return ukuran;
+    }
+
+    public int getUnknownCellsSize() {
+        return unknownCells.size();
     }
 
     public int[][] getclue() {
