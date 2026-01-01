@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Mosaic {
@@ -6,15 +7,12 @@ public class Mosaic {
     private int[][] clue;
     private int[][] partialSolution;
     private List<NumCell> numberCell;
+    private List<Cell> unknownCells;
 
+    // Pergerakan row dan col ke tetangga termasuk cell itu sendiri
     private final int[] MOVEROW = {0, -1, -1, 0, 1, 1, 1, 0, -1};
     private final int[] MOVECOL = {0, 0, 1, 1, 1, 0, -1, -1, -1};
 
-    /**
-     * Konstruktor untuk membuat objek Mosaic
-     * @param ukuran Ukuran grid (n x n)
-     * @param clue Grid berisi angka clue
-     */
     public Mosaic(int ukuran, int[][] clue) {
         this.ukuran = ukuran;
         this.clue = new int[ukuran][ukuran];
@@ -25,7 +23,7 @@ public class Mosaic {
 
         this.partialSolution = new int[ukuran][ukuran];
 
-        this.numberCell = new ArrayList<NumCell>();
+        this.numberCell = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 if (clue[i][j] != -1) {
@@ -35,12 +33,22 @@ public class Mosaic {
         }
     }
 
+    private static class Cell {
+        int row;
+        int col;
+
+        public Cell(int row, int col) {
+            this.row = row;
+            this.col = col;
+        }
+    }
+
     private static class NumCell {
         int row;
         int col;
-        Integer value;
+        int value;
 
-        public NumCell(int row, int col, Integer value) {
+        public NumCell(int row, int col, int value) {
             this.row = row;
             this.col = col;
             this.value = value;
@@ -49,7 +57,6 @@ public class Mosaic {
 
     private void heuristic() {
         boolean isChanged = true;
-
         while (isChanged) {
             isChanged = false;
 
@@ -59,6 +66,18 @@ public class Mosaic {
                     if (curClue >= 0) {
                         isChanged = (isChanged || checkClue(row, col, curClue));
                     }
+                }
+            }
+        }
+        putRemainingUnknownCell();
+    }
+
+    private void putRemainingUnknownCell() {
+        unknownCells = new ArrayList<>();
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                if (partialSolution[i][j] == 0) {
+                    unknownCells.add(new Cell(i, j));
                 }
             }
         }
@@ -117,33 +136,43 @@ public class Mosaic {
         }
     }
 
-    public int fitnessFunction(int[][] gridSolusi) {
+    public int fitnessFunction(int[] kromosom) {
+        int[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
-        for (NumCell numCell : numberCell) {
-            int curRow = numCell.row, curCol = numCell.col;
-            int blackCnt = hitungSelHitamSekitar(gridSolusi, curRow, curCol);
-            fitness += Math.abs(numCell.value - blackCnt);
+        for (NumCell cell : numberCell) {
+            int blackCnt = hitungSelHitamSekitar(gridSolusi, cell.row, cell.col);
+            fitness += Math.abs(cell.value - blackCnt);
         }
         return -fitness;
     }
 
-    /**
-     * Menghitung jumlah sel hitam di sekitar sel (termasuk sel itu sendiri)
-     * @param grid Grid solusi
-     * @param baris Posisi baris
-     * @param kolom Posisi kolom
-     * @return Jumlah sel hitam di sekitarnya
-     */
-    private int hitungSelHitamSekitar(int[][] grid, int baris, int kolom) {
-        // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
-        int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
-        int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+    private int[][] makeSolutionGrid(int[] kromosom) {
+        int[][] solutionGrid = new int[ukuran][ukuran];
 
+        // Isi grid dari kromosom buatan GA
+        for (int i = 0; i < kromosom.length; i++) {
+            int row = unknownCells.get(i).row;
+            int col = unknownCells.get(i).col;
+            solutionGrid[row][col] = kromosom[i];
+        }
+
+        // Isi sisa grid dari warna fixed hasil heuristik
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                if (partialSolution[i][j] != 0) {
+                    solutionGrid[i][j] = partialSolution[i][j];
+                }
+            }
+        }
+        return solutionGrid;
+    }
+
+    private int hitungSelHitamSekitar(int[][] grid, int baris, int kolom) {
         int hitung = 0;
-        for (int i = 0; i < moveRow.length; i++) {
-            int newRow = baris + moveRow[i];
-            int newCol = kolom + moveCol[i];
-            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == 1) {
+        for (int i = 0; i < MOVEROW.length; i++) {
+            int newRow = baris + MOVEROW[i];
+            int newCol = kolom + MOVECOL[i];
+            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == 2) {
                 hitung++;
             }
         }
