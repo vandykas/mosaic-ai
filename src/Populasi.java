@@ -10,7 +10,6 @@ public class Populasi {
     private final int maxPopulationSize;
     private final List<Individu> daftarIndividu;
     private int populationSize;
-    private double fitnessRataRata;
 
     public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
@@ -23,11 +22,15 @@ public class Populasi {
         return populationSize;
     }
 
+    public Individu getIndividuTerbaik() {
+        return daftarIndividu.get(0);
+    }
+
     public void initPopulasi() {
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = 0; i < maxPopulationSize; i++) {
             Individu individu = new Individu(random, mosaic);
             individu.hitungFitness();
-            daftarIndividu.add(individu);
+            addIndividu(individu);
         }
     }
 
@@ -45,12 +48,12 @@ public class Populasi {
         this.populationSize++;
     }
 
-    public void hitungFitnessRataRata() {
+    public double hitungFitnessRataRata() {
         double total = 0;
         for (Individu individu : daftarIndividu) {
             total += individu.getFitness();
         }
-        this.fitnessRataRata = total / daftarIndividu.size();
+        return total / maxPopulationSize;
     }
     
     public void sortPopulation() {
@@ -108,15 +111,4 @@ public class Populasi {
         return terbaik;
     }
     
-    public Individu getIndividuTerbaik() {
-        return daftarIndividu.get(0);
-    }
-
-    public List<Individu> getDaftarIndividu() {
-        return daftarIndividu;
-    }
-    
-    public double getFitnessRataRata() {
-        return fitnessRataRata;
-    }
 }

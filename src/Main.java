@@ -1,5 +1,7 @@
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Locale;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,60 +14,52 @@ public class Main {
         File fileInput = new File(args[1]);
 
         try {
-            // Membaca hyperparameter
-            Scanner sc = new Scanner(fileHyperparameter);
-            sc.useLocale(Locale.US);
-            int populasi = sc.nextInt();
-            double mutation_rate = sc.nextDouble();
-            double elitism_rate = sc.nextDouble();
-            int max_generation = sc.nextInt();
-            double convergence_treshold = sc.nextDouble();
-            int convergence_window = sc.nextInt();
-            int repetisi = sc.nextInt();
-            sc.close();
-
             // Membaca input puzzle
-            sc = new Scanner(fileInput);
-            
-            int ukuranGrid = sc.nextInt();
-            int[][] clue = new int[ukuranGrid][ukuranGrid];
+            Scanner sc = new Scanner(fileInput);
             sc.useLocale(Locale.US);
-            for (int i = 0; i < ukuranGrid; i++) {
-                for (int j = 0; j < ukuranGrid; j++) {
-                    clue[i][j] = sc.nextInt();
-                }
-            }
+            Mosaic mosaic = readAndMakeMosaic(sc);
+
+            // Membaca hyperparameter
+            sc = new Scanner(fileHyperparameter);
+            int maxPopulationSize = sc.nextInt();
+            double mutationRate = sc.nextDouble();
+            double elitismRate = sc.nextDouble();
+            int maxGeneration = sc.nextInt();
+            double convergenceThreshold = sc.nextDouble();
+            int convergenceWindow = sc.nextInt();
+            GA algoritmaGenetika = new GA(
+                    mosaic,
+                    maxPopulationSize,
+                    mutationRate,
+                    elitismRate,
+                    maxGeneration,
+                    convergenceThreshold,
+                    convergenceWindow
+            );
             sc.close();
 
-            // Membuat objek Mosaic
-            Mosaic mosaic = new Mosaic(ukuranGrid, clue);
-            
-            // Menjalankan GA untuk setiap repetisi
-            for (int r = 0; r < repetisi; r++) {
-                System.out.println("Repetisi ke-" + (r + 1));
-                
-                // Membuat objek GA dengan seed sesuai repetisi
-                GA algoritmaGenetika = new GA(
-                    mosaic,
-                    populasi,
-                    mutation_rate,
-                    elitism_rate,
-                    max_generation,
-                    convergence_treshold,
-                    convergence_window,
-                    r // r ini jadi seed
-                );
-                
-                // Menjalankan algoritma genetika
-                algoritmaGenetika.jalankan();
-                
-                // Mendapatkan solusi terbaik
-                Individu solusiTerbaik = algoritmaGenetika.getIndividuTerbaik();
-                System.out.println("Fitness terbaik: " + solusiTerbaik.getFitness());
+            if (mosaic.getUnknownCellsSize() == 0) {
+                System.out.println("Diselesaikan heuristic");
+                mosaic.printHeuristicSolution();
             }
-
-        } catch (FileNotFoundException e) {
+            else {
+                algoritmaGenetika.run();
+                System.out.println(mosaic.getUnknownCellsSize());
+            }
+        }
+        catch (FileNotFoundException e) {
             System.out.println("File tidak ditemukan: " + e.getMessage());
         }
+    }
+
+    private static Mosaic readAndMakeMosaic(Scanner sc) {
+        int ukuranGrid = sc.nextInt();
+        int[][] clue = new int[ukuranGrid][ukuranGrid];
+        for (int i = 0; i < ukuranGrid; i++) {
+            for (int j = 0; j < ukuranGrid; j++) {
+                clue[i][j] = sc.nextInt();
+            }
+        }
+        return new Mosaic(ukuranGrid, clue);
     }
 }

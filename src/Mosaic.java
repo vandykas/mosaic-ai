@@ -33,6 +33,10 @@ public class Mosaic {
         heuristic();
     }
 
+    public int getUnknownCellsSize() {
+        return unknownCells.size();
+    }
+
     private static class Cell {
         int row;
         int col;
@@ -179,20 +183,27 @@ public class Mosaic {
         return hitung;
     }
 
-    public int getUkuran() {
-        return ukuran;
-    }
-
-    public int getUnknownCellsSize() {
-        return unknownCells.size();
-    }
-
-    public int[][] getclue() {
-        return clue;
-    }
-
     public boolean isInTheGrid(int x, int y) {
         return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
+    }
+
+    public void printSolution(boolean[] kromosom) {
+        int[][] solution = makeSolutionGrid(kromosom);
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                System.out.print(solution[i][j] == 1 ? "P " : "H ");
+            }
+            System.out.println();
+        }
+    }
+
+    public void printHeuristicSolution() {
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                System.out.print(partialSolution[i][j] == 1 ? "P " : "H ");
+            }
+            System.out.println();
+        }
     }
 }
 

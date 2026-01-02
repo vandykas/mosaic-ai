@@ -2,70 +2,74 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Kelas utama algoritma genetika
- */
 public class GA {
     private final Mosaic mosaic;
-    private final Random random;
+    private Random random;
     private final int maxPopulationSize;
-    private final double mutation_rate;
-    private final double elitism_rate;
-    private final int max_generation;
-    private final double convergence_treshold;
-    private final int convergence_window;
+    private final double mutationRate;
+    private final double elitismRate;
+    private final int maxGeneration;
+    private final double convergenceThreshold;
+    private final int convergenceWindow;
     private Individu individuTerbaik;
     private List<Double> riwayatFitnessPopulasi;
     
-    public GA(Mosaic mosaic, int maxPopulationSize, double mutation_rate,
-              double elitism_rate, int max_generation, double convergence_threshold,
-              int convergence_window, int seed) {
-        
+    public GA(Mosaic mosaic, int maxPopulationSize, double mutationRate, double elitismRate, int maxGeneration,
+              double convergence_threshold, int convergenceWindow) {
         this.mosaic = mosaic;
-        this.maxPopulationSize = populasi;
-        this.mutation_rate = mutation_rate;
-        this.elitism_rate = elitism_rate;
-        this.max_generation = max_generation;
-        this.convergence_treshold = convergence_threshold;
-        this.convergence_window = convergence_window;
-        this.random = new Random(seed);
+        this.maxPopulationSize = maxPopulationSize;
+        this.mutationRate = mutationRate;
+        this.elitismRate = elitismRate;
+        this.maxGeneration = maxGeneration;
+        this.convergenceThreshold = convergence_threshold;
+        this.convergenceWindow = convergenceWindow;
         this.riwayatFitnessPopulasi = new ArrayList<>();
     }
 
-    public void jalankan() {
+    public void setRandom(int seed) {
+        this.random = new Random(seed);
+    }
+
+    public void run() {
+        for (int r = 0; r < maxGeneration; r++) {
+            System.out.println("Repetisi ke-" + (r + 1));
+
+            setRandom(r);
+            simulate();
+
+            Individu solusiTerbaik = getIndividuTerbaik();
+            System.out.println("Fitness terbaik: " + solusiTerbaik.getFitness());
+            mosaic.printSolution(solusiTerbaik.getKromosom());
+            System.out.println();
+        }
+    }
+
+    private void simulate() {
         Populasi currPopulation = initPopulasi();
         individuTerbaik = currPopulation.getIndividuTerbaik();
 
         int generasi = 0;
         boolean konvergen = false;
-        while (generasi < max_generation && !konvergen) {
-            Populasi nextPopulation = buatGenerasiBaru();
-            
+        while (generasi < maxGeneration && !konvergen) {
+            Populasi nextPopulation = buatGenerasiBaru(currPopulation);
+
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
-            if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
-                individuTerbaik = terbaikSaatIni;
-            }
-            
-            riwayatFitnessPopulasi.add(nextPopulation.getFitnessRataRata());
-            if (generasi >= convergence_window) {
+            updateBestIndividu(terbaikSaatIni);
+
+            riwayatFitnessPopulasi.add(nextPopulation.hitungFitnessRataRata());
+            if (generasi >= convergenceWindow) {
                 konvergen = cekKonvergensi();
             }
-            
-            if (generasi % 1000 == 0) {
-                System.out.println("Generasi " + generasi +
-                    " - Fitness terbaik: " + individuTerbaik.getFitness() +
-                    " - Rata-rata: " + nextPopulation.getFitnessRataRata());
-            }
-            
-            if (individuTerbaik.getFitness() == 0) {
-                System.out.println("Solusi sempurna ditemukan pada generasi " + generasi);
-                break;
-            }
+
+            currPopulation = nextPopulation;
             generasi++;
         }
-        
-        System.out.println("Algoritma selesai. Generasi terakhir: " + generasi);
-        System.out.println("Fitness terbaik: " + individuTerbaik.getFitness());
+    }
+
+    private void updateBestIndividu(Individu terbaikSaatIni) {
+        if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
+            individuTerbaik = terbaikSaatIni;
+        }
     }
 
     private Populasi initPopulasi() {
@@ -76,46 +80,46 @@ public class GA {
     }
     
     private Populasi buatGenerasiBaru(Populasi currPopulation) {
-        Populasi nextPopulation = currPopulation.initPopulasiWithElitism(maxPopulationSize);
+        Populasi nextPopulation = currPopulation.initPopulasiWithElitism(elitismRate);
         while (nextPopulation.getPopulationSize() < maxPopulationSize) {
             Individu parent1 = currPopulation.seleksiRoulette();
             Individu parent2 = currPopulation.seleksiRoulette();
 
             Individu[] children = parent1.singlePointCrossover(parent2);
-            children[0].mutasi(mutation_rate);
-            children[1].mutasi(mutation_rate);
+            children[0].mutasi(mutationRate);
+            children[1].mutasi(mutationRate);
+
+            children[0].hitungFitness();
+            children[1].hitungFitness();
 
             nextPopulation.addIndividu(children[0]);
             if (nextPopulation.getPopulationSize() < maxPopulationSize) {
                 nextPopulation.addIndividu(children[1]);
             }
         }
+        nextPopulation.sortPopulation();
         return nextPopulation;
     }
     
     private boolean cekKonvergensi() {
-        if (riwayatFitnessPopulasi.size() < convergence_window) {
+        if (riwayatFitnessPopulasi.size() < convergenceWindow) {
             return false;
         }
         
-        // Ambil jendela terakhir
-        List<Double> jendela = riwayatFitnessPopulasi.subList(
-            riwayatFitnessPopulasi.size() - convergence_window,
-            riwayatFitnessPopulasi.size());
+        int start = riwayatFitnessPopulasi.size() - convergenceWindow;
+        int end = riwayatFitnessPopulasi.size();
         
-        // Cari nilai maksimum dan minimum
-        double maks = Double.NEGATIVE_INFINITY;
-        double min = Double.POSITIVE_INFINITY;
+        double maxFitness = Double.NEGATIVE_INFINITY;
+        double minFitness = Double.POSITIVE_INFINITY;
         
-        for (double fitness : jendela) {
-            if (fitness > maks) maks = fitness;
-            if (fitness < min) min = fitness;
+        for (int i = start; i < end; i++) {
+            double fitness =  riwayatFitnessPopulasi.get(i);
+            maxFitness = Math.max(maxFitness, fitness);
+            minFitness = Math.min(minFitness, fitness);
         }
         
-        // Hitung perbedaan
-        double perbedaan = Math.abs(maks - min);
-        
-        return perbedaan <= convergence_treshold;
+        double perbedaan = Math.abs(maxFitness - minFitness);
+        return perbedaan <= convergenceThreshold;
     }
     
     public Individu getIndividuTerbaik() {
