@@ -9,7 +9,6 @@ public class Populasi {
     private final Random random;
     private final int maxPopulationSize;
     private final List<Individu> daftarIndividu;
-    private int populationSize;
 
     public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
@@ -19,7 +18,7 @@ public class Populasi {
     }
 
     public int getPopulationSize() {
-        return populationSize;
+        return daftarIndividu.size();
     }
 
     public Individu getIndividuTerbaik() {
@@ -29,7 +28,6 @@ public class Populasi {
     public void initPopulasi() {
         for (int i = 0; i < maxPopulationSize; i++) {
             Individu individu = new Individu(random, mosaic);
-            individu.hitungFitness();
             addIndividu(individu);
         }
     }
@@ -38,14 +36,15 @@ public class Populasi {
         int elitismCount = (int) (maxPopulationSize * elitismRate);
         Populasi nextPop = new Populasi(maxPopulationSize, mosaic, random);
         for (int i = 0; i < elitismCount; i++) {
-            nextPop.addIndividu(daftarIndividu.get(i));
+            nextPop.addIndividu(new Individu(
+                    random, mosaic, daftarIndividu.get(i).getKromosom()
+            ));
         }
         return nextPop;
     }
 
     public void addIndividu(Individu individu) {
         this.daftarIndividu.add(individu);
-        this.populationSize++;
     }
 
     public double hitungFitnessRataRata() {
@@ -57,7 +56,7 @@ public class Populasi {
     }
     
     public void sortPopulation() {
-        daftarIndividu.sort(Collections.reverseOrder());
+        Collections.sort(daftarIndividu);
     }
     
     public Individu seleksiRoulette() {

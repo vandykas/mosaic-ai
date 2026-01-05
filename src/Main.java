@@ -18,6 +18,7 @@ public class Main {
             Scanner sc = new Scanner(fileInput);
             sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
+            mosaic.runHeuristic();
 
             // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
@@ -27,6 +28,7 @@ public class Main {
             int maxGeneration = sc.nextInt();
             double convergenceThreshold = sc.nextDouble();
             int convergenceWindow = sc.nextInt();
+            int repetisi = sc.nextInt();
             GA algoritmaGenetika = new GA(
                     mosaic,
                     maxPopulationSize,
@@ -43,8 +45,8 @@ public class Main {
                 mosaic.printHeuristicSolution();
             }
             else {
-                algoritmaGenetika.run();
-                System.out.println(mosaic.getUnknownCellsSize());
+                algoritmaGenetika.run(repetisi);
+                mosaic.printHeuristicSolution();
             }
         }
         catch (FileNotFoundException e) {

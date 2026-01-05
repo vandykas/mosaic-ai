@@ -10,6 +10,7 @@ public class Individu implements Comparable<Individu> {
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
         this.random = random;
         this.mosaic = mosaic;
+        this.fitness = mosaic.fitnessFunction(kromosom);
         this.kromosom = Arrays.copyOf(kromosom, kromosom.length);
     }
 
@@ -19,11 +20,12 @@ public class Individu implements Comparable<Individu> {
 
         this.kromosom = new boolean[mosaic.getUnknownCellsSize()];
         initKromosom();
+        this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
     @Override
     public int compareTo(Individu o) {
-        return Double.compare(this.fitness, o.fitness);
+        return Double.compare(o.fitness, this.fitness);
     }
 
     public boolean[] getKromosom() {
@@ -42,10 +44,6 @@ public class Individu implements Comparable<Individu> {
         }
     }
 
-    public void hitungFitness() {
-        this.fitness = mosaic.fitnessFunction(kromosom);
-    }
-    
     public void mutasi(double mutation_rate) {
         for (int i = 0; i < kromosom.length; i++) {
             if (random.nextDouble() < mutation_rate) {

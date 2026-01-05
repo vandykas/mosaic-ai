@@ -30,8 +30,8 @@ public class GA {
         this.random = new Random(seed);
     }
 
-    public void run() {
-        for (int r = 0; r < maxGeneration; r++) {
+    public void run(int repetisi) {
+        for (int r = 0; r < repetisi; r++) {
             System.out.println("Repetisi ke-" + (r + 1));
 
             setRandom(r);
@@ -82,15 +82,12 @@ public class GA {
     private Populasi buatGenerasiBaru(Populasi currPopulation) {
         Populasi nextPopulation = currPopulation.initPopulasiWithElitism(elitismRate);
         while (nextPopulation.getPopulationSize() < maxPopulationSize) {
-            Individu parent1 = currPopulation.seleksiRoulette();
-            Individu parent2 = currPopulation.seleksiRoulette();
+            Individu parent1 = currPopulation.seleksiTournament(4);
+            Individu parent2 = currPopulation.seleksiTournament(4);
 
             Individu[] children = parent1.singlePointCrossover(parent2);
             children[0].mutasi(mutationRate);
             children[1].mutasi(mutationRate);
-
-            children[0].hitungFitness();
-            children[1].hitungFitness();
 
             nextPopulation.addIndividu(children[0]);
             if (nextPopulation.getPopulationSize() < maxPopulationSize) {

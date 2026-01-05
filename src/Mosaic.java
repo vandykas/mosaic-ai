@@ -4,9 +4,15 @@ import java.util.List;
 public class Mosaic {
     private final int ukuran;
     private final int[][] clue;
-    private final int[][] partialSolution;
+    private final CellState[][] partialSolution;
     private final List<NumCell> numberCell;
     private List<Cell> unknownCells;
+
+    private enum CellState {
+        UNKNOWN,
+        BLACK,
+        WHITE
+    }
 
     // Pergerakan row dan col ke tetangga termasuk cell itu sendiri
     private final int[] MOVEROW = {0, -1, -1, 0, 1, 1, 1, 0, -1};
@@ -20,7 +26,12 @@ public class Mosaic {
             System.arraycopy(clue[i], 0, this.clue[i], 0, ukuran);
         }
 
-        this.partialSolution = new int[ukuran][ukuran];
+        this.partialSolution = new CellState[ukuran][ukuran];
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                partialSolution[i][j] = CellState.UNKNOWN;
+            }
+        }
 
         this.numberCell = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
@@ -30,7 +41,6 @@ public class Mosaic {
                 }
             }
         }
-        heuristic();
     }
 
     public int getUnknownCellsSize() {
@@ -59,7 +69,7 @@ public class Mosaic {
         }
     }
 
-    private void heuristic() {
+    public void runHeuristic() {
         boolean isChanged = true;
         while (isChanged) {
             isChanged = false;
@@ -80,7 +90,7 @@ public class Mosaic {
         unknownCells = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
-                if (partialSolution[i][j] == 0) {
+                if (partialSolution[i][j] == CellState.UNKNOWN) {
                     unknownCells.add(new Cell(i, j));
                 }
             }
@@ -88,31 +98,34 @@ public class Mosaic {
     }
 
     private boolean checkClue(int row, int col, int curClue) {
-        /*
-        0 = tidak diketahui
-        1 = putih
-        2 = hitam
-         */
-        int[] colorCount = new int[3];
+        int blackCount = 0, unknownCount = 0;
         for (int i = 0; i < MOVEROW.length; i++) {
             int newRow = MOVEROW[i] + row;
             int newCol = MOVECOL[i] + col;
             if (!isInTheGrid(newRow, newCol)) {
                 continue;
             }
-            colorCount[partialSolution[newRow][newCol]]++;
+
+            switch (partialSolution[newRow][newCol]) {
+                case BLACK:
+                    blackCount++;
+                    break;
+                case UNKNOWN:
+                    unknownCount++;
+                    break;
+            }
         }
 
-        int remainingBlack = curClue - colorCount[2];
+        int remainingBlack = curClue - blackCount;
 
         // Ubah semua ke hitam
-        if (canFilledWithBlack(remainingBlack, colorCount[0])) {
-            changeNeigbourColor(row, col, 2);
+        if (canFilledWithBlack(remainingBlack, unknownCount)) {
+            changeNeighbourColor(row, col, CellState.BLACK);
             return true;
         }
         // Ubah semua ke putih
-        else if (canFilledWithWhite(remainingBlack, colorCount[0])) {
-            changeNeigbourColor(row, col, 1);
+        else if (canFilledWithWhite(remainingBlack, unknownCount)) {
+            changeNeighbourColor(row, col, CellState.WHITE);
             return true;
         }
         return false;
@@ -126,7 +139,7 @@ public class Mosaic {
         return remainingBlack == 0 && unknown > 0;
     }
 
-    private void changeNeigbourColor(int row, int col, int color) {
+    private void changeNeighbourColor(int row, int col, CellState color) {
         for (int i = 0; i < MOVEROW.length; i++) {
             int newRow = MOVEROW[i] + row;
             int newCol = MOVECOL[i] + col;
@@ -134,14 +147,14 @@ public class Mosaic {
                 continue;
             }
 
-            if (partialSolution[newRow][newCol] == 0) {
+            if (partialSolution[newRow][newCol] == CellState.UNKNOWN) {
                 partialSolution[newRow][newCol] = color;
             }
         }
     }
 
     public double fitnessFunction(boolean[] kromosom) {
-        int[][] gridSolusi = makeSolutionGrid(kromosom);
+        CellState[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
         for (NumCell cell : numberCell) {
             int blackCnt = hitungSelHitamSekitar(gridSolusi, cell.row, cell.col);
@@ -150,20 +163,20 @@ public class Mosaic {
         return 1.0 / (fitness + 1);
     }
 
-    private int[][] makeSolutionGrid(boolean[] kromosom) {
-        int[][] solutionGrid = new int[ukuran][ukuran];
+    private CellState[][] makeSolutionGrid(boolean[] kromosom) {
+        CellState[][] solutionGrid = new CellState[ukuran][ukuran];
 
         // Isi grid dari kromosom buatan GA
         for (int i = 0; i < kromosom.length; i++) {
             int row = unknownCells.get(i).row;
             int col = unknownCells.get(i).col;
-            solutionGrid[row][col] = kromosom[i] ? 2 : 1;
+            solutionGrid[row][col] = kromosom[i] ? CellState.WHITE : CellState.BLACK;
         }
 
         // Isi sisa grid dari warna fixed hasil heuristik
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
-                if (partialSolution[i][j] != 0) {
+                if (partialSolution[i][j] != CellState.UNKNOWN) {
                     solutionGrid[i][j] = partialSolution[i][j];
                 }
             }
@@ -171,16 +184,16 @@ public class Mosaic {
         return solutionGrid;
     }
 
-    private int hitungSelHitamSekitar(int[][] grid, int baris, int kolom) {
-        int hitung = 0;
+    private int hitungSelHitamSekitar(CellState[][] grid, int baris, int kolom) {
+        int blackCount = 0;
         for (int i = 0; i < MOVEROW.length; i++) {
             int newRow = baris + MOVEROW[i];
             int newCol = kolom + MOVECOL[i];
-            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == 2) {
-                hitung++;
+            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == CellState.BLACK) {
+                blackCount++;
             }
         }
-        return hitung;
+        return blackCount;
     }
 
     public boolean isInTheGrid(int x, int y) {
@@ -188,10 +201,10 @@ public class Mosaic {
     }
 
     public void printSolution(boolean[] kromosom) {
-        int[][] solution = makeSolutionGrid(kromosom);
+        CellState[][] solution = makeSolutionGrid(kromosom);
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
-                System.out.print(solution[i][j] == 1 ? "P " : "H ");
+                System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
             }
             System.out.println();
         }
@@ -200,7 +213,17 @@ public class Mosaic {
     public void printHeuristicSolution() {
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
-                System.out.print(partialSolution[i][j] == 1 ? "P " : "H ");
+                switch (partialSolution[i][j]) {
+                    case BLACK:
+                        System.out.print("H ");
+                        break;
+                    case WHITE:
+                        System.out.print("P ");
+                        break;
+                    default:
+                        System.out.print("U ");
+                        break;
+                }
             }
             System.out.println();
         }
