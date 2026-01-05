@@ -29,6 +29,8 @@ public class Main {
             double convergenceThreshold = sc.nextDouble();
             int convergenceWindow = sc.nextInt();
             int repetisi = sc.nextInt();
+            sc.close();
+
             GA algoritmaGenetika = new GA(
                     mosaic,
                     maxPopulationSize,
@@ -38,7 +40,6 @@ public class Main {
                     convergenceThreshold,
                     convergenceWindow
             );
-            sc.close();
 
             if (mosaic.getUnknownCellsSize() == 0) {
                 System.out.println("Diselesaikan heuristic");

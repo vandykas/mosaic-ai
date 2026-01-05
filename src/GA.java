@@ -11,7 +11,6 @@ public class GA {
     private final int maxGeneration;
     private final double convergenceThreshold;
     private final int convergenceWindow;
-    private Individu individuTerbaik;
     private List<Double> riwayatFitnessPopulasi;
     
     public GA(Mosaic mosaic, int maxPopulationSize, double mutationRate, double elitismRate, int maxGeneration,
@@ -35,18 +34,17 @@ public class GA {
             System.out.println("Repetisi ke-" + (r + 1));
 
             setRandom(r);
-            simulate();
+            Individu solusiTerbaik = simulate();
 
-            Individu solusiTerbaik = getIndividuTerbaik();
             System.out.println("Fitness terbaik: " + solusiTerbaik.getFitness());
             mosaic.printSolution(solusiTerbaik.getKromosom());
             System.out.println();
         }
     }
 
-    private void simulate() {
+    private Individu simulate() {
         Populasi currPopulation = initPopulasi();
-        individuTerbaik = currPopulation.getIndividuTerbaik();
+        Individu individuTerbaik = currPopulation.getIndividuTerbaik();
 
         int generasi = 0;
         boolean konvergen = false;
@@ -54,7 +52,9 @@ public class GA {
             Populasi nextPopulation = buatGenerasiBaru(currPopulation);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
-            updateBestIndividu(terbaikSaatIni);
+            if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
+                individuTerbaik = terbaikSaatIni;
+            }
 
             riwayatFitnessPopulasi.add(nextPopulation.hitungFitnessRataRata());
             if (generasi >= convergenceWindow) {
@@ -64,12 +64,7 @@ public class GA {
             currPopulation = nextPopulation;
             generasi++;
         }
-    }
-
-    private void updateBestIndividu(Individu terbaikSaatIni) {
-        if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
-            individuTerbaik = terbaikSaatIni;
-        }
+        return individuTerbaik;
     }
 
     private Populasi initPopulasi() {
@@ -117,9 +112,5 @@ public class GA {
         
         double perbedaan = Math.abs(maxFitness - minFitness);
         return perbedaan <= convergenceThreshold;
-    }
-    
-    public Individu getIndividuTerbaik() {
-        return individuTerbaik;
     }
 }

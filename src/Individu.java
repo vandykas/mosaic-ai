@@ -2,9 +2,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Individu implements Comparable<Individu> {
-    private Random random;
-    private Mosaic mosaic;
-    private boolean[] kromosom;
+    private final Random random;
+    private final Mosaic mosaic;
+    private final boolean[] kromosom;
     private double fitness;
 
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
@@ -50,6 +50,7 @@ public class Individu implements Comparable<Individu> {
                 kromosom[i] = !kromosom[i];
             }
         }
+        this.fitness = mosaic.fitnessFunction(kromosom);
     }
     
     public Individu[] singlePointCrossover(Individu pasangan) {
