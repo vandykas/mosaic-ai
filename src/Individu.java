@@ -53,7 +53,7 @@ public class Individu implements Comparable<Individu> {
         this.fitness = mosaic.fitnessFunction(kromosom);
     }
     
-    public Individu[] singlePointCrossover(Individu pasangan) {
+    public Individu[] onePointCrossover(Individu pasangan) {
         boolean[] child1 = kromosom.clone();
         boolean[] child2 = pasangan.getKromosom().clone();
 
@@ -69,7 +69,7 @@ public class Individu implements Comparable<Individu> {
         return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
     }
 
-    public Individu[] doublePointCrossover(Individu pasangan) {
+    public Individu[] twoPointCrossover(Individu pasangan) {
         boolean[] child1 = kromosom.clone();
         boolean[] child2 = pasangan.getKromosom().clone();
 
@@ -86,6 +86,21 @@ public class Individu implements Comparable<Individu> {
             boolean temp = child1[i];
             child1[i] = child2[i];
             child2[i] = temp;
+        }
+
+        return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
+    }
+
+    public Individu[] uniformCrossover(Individu pasangan) {
+        boolean[] child1 = kromosom.clone();
+        boolean[] child2 = pasangan.getKromosom().clone();
+
+        for (int i = 0; i < kromosom.length; i++) {
+            if (random.nextDouble() < 0.5) {
+                boolean temp = child1[i];
+                child1[i] = child2[i];
+                child2[i] = temp;
+            }
         }
 
         return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};

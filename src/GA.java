@@ -80,7 +80,7 @@ public class GA {
             Individu parent1 = currPopulation.seleksiTournament(4);
             Individu parent2 = currPopulation.seleksiTournament(4);
 
-            Individu[] children = parent1.singlePointCrossover(parent2);
+            Individu[] children = parent1.onePointCrossover(parent2);
             children[0].mutasi(mutationRate);
             children[1].mutasi(mutationRate);
 
