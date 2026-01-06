@@ -46,6 +46,7 @@ public class Main {
                 mosaic.printHeuristicSolution();
             }
             else {
+                mosaic.createUnknownCellsProbability();
                 algoritmaGenetika.run(repetisi);
                 mosaic.printHeuristicSolution();
             }

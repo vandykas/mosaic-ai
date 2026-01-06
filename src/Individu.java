@@ -36,11 +36,15 @@ public class Individu implements Comparable<Individu> {
         return fitness;
     }
 
-    private void initKromosom() {
+    public void initKromosom() {
         for (int i = 0; i < kromosom.length; i++) {
-            if (random.nextDouble() > 0.5) {
-                kromosom[i] = true;
-            }
+            kromosom[i] = random.nextDouble() > 0.5;
+        }
+    }
+
+    public void initKromosomWithProbability() {
+        for (int i = 0; i < kromosom.length; i++) {
+            kromosom[i] = random.nextDouble() > mosaic.getUnknownCellsProb(i);
         }
     }
 

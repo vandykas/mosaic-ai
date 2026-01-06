@@ -8,6 +8,7 @@ public class Mosaic {
     private final CellState[][] partialSolution;
     private final List<NumCell> numberCell;
     private List<Cell> unknownCells;
+    private double[] unknownCellsProb;
 
     private enum CellState {
         UNKNOWN,
@@ -44,10 +45,14 @@ public class Mosaic {
 
     record Cell(int row, int col) {}
 
-    record NumCell(int row, int col, int value) {}
+    record NumCell(int row, int col, int clue) {}
 
     public int getUnknownCellsSize() {
         return unknownCells.size();
+    }
+
+    public double getUnknownCellsProb(int idx) {
+        return unknownCellsProb[idx];
     }
 
     private ArrayList<Cell> getNeighbors(int row, int col) {
@@ -73,14 +78,8 @@ public class Mosaic {
         boolean isChanged = true;
         while (isChanged) {
             isChanged = false;
-
-            for (int row = 0; row < ukuran; row++) {
-                for (int col = 0; col < ukuran; col++) {
-                    int curClue = clue[row][col];
-                    if (curClue >= 0) {
-                        isChanged = (isChanged || checkClue(row, col, curClue));
-                    }
-                }
+            for (NumCell cell : numberCell) {
+                isChanged = (isChanged || checkClue(cell.row, cell.col, cell.clue));
             }
         }
         putRemainingUnknownCell();
@@ -144,18 +143,70 @@ public class Mosaic {
         }
     }
 
+    public void createUnknownCellsProbability() {
+        int unknownCount = getUnknownCellsSize();
+        this.unknownCellsProb = new double[unknownCount];
+        for (int i = 0; i < unknownCount; i++) {
+            addClueInfluence(i, unknownCells.get(i).row, unknownCells.get(i).col);
+        }
+
+        normalize();
+    }
+
+    private void addClueInfluence(int idx, int row, int col) {
+        List<Cell> neighbors = getNeighbors(row, col);
+        for (Cell cell : neighbors) {
+            int clueVal = clue[cell.row][cell.col];
+            if (clueVal != -1) {
+                int blackCount = countNeighborsSpecificCell(partialSolution, cell.row, cell.col, CellState.BLACK);
+                int unknownCount = countNeighborsSpecificCell(partialSolution, cell.row, cell.col, CellState.UNKNOWN);
+                if (unknownCount == 0) {
+                    continue;
+                }
+
+                int remainingBlack = clueVal - blackCount;
+                double p = (remainingBlack / 3.5) / unknownCount;
+                unknownCellsProb[idx] += p;
+            }
+        }
+    }
+
+    private void normalize() {
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
+
+        int unknownCount = getUnknownCellsSize();
+        for (double prob : unknownCellsProb) {
+            min = Math.min(min, prob);
+            max = Math.max(max, prob);
+        }
+
+        if (max == min) {
+            Arrays.fill(unknownCellsProb, 0.5);
+        }
+        else {
+            for (int i = 0; i < unknownCount; i++) {
+                unknownCellsProb[i] = (unknownCellsProb[i] - min) / (max - min);
+            }
+        }
+    }
+
     public double fitnessFunction(boolean[] kromosom) {
         CellState[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
         for (NumCell cell : numberCell) {
-            int blackCnt = countNeighborsBlackCell(gridSolusi, cell.row, cell.col);
-            fitness += Math.abs(cell.value - blackCnt);
+            int blackCnt = countNeighborsSpecificCell(gridSolusi, cell.row, cell.col, CellState.BLACK);
+            fitness += Math.abs(cell.clue - blackCnt);
         }
         return 1.0 / (fitness + 1);
     }
 
     private CellState[][] makeSolutionGrid(boolean[] kromosom) {
         CellState[][] solutionGrid = new CellState[ukuran][ukuran];
+        // Isi sisa grid dari warna fixed hasil heuristik
+        for (int i = 0; i < ukuran; i++) {
+            System.arraycopy(partialSolution[i], 0, solutionGrid[i], 0, ukuran);
+        }
 
         // Isi grid dari kromosom buatan GA
         for (int i = 0; i < kromosom.length; i++) {
@@ -163,26 +214,17 @@ public class Mosaic {
             int col = unknownCells.get(i).col;
             solutionGrid[row][col] = kromosom[i] ? CellState.WHITE : CellState.BLACK;
         }
-
-        // Isi sisa grid dari warna fixed hasil heuristik
-        for (int i = 0; i < ukuran; i++) {
-            for (int j = 0; j < ukuran; j++) {
-                if (partialSolution[i][j] != CellState.UNKNOWN) {
-                    solutionGrid[i][j] = partialSolution[i][j];
-                }
-            }
-        }
         return solutionGrid;
     }
 
-    private int countNeighborsBlackCell(CellState[][] grid, int row, int col) {
-        int blackCount = 0;
+    private int countNeighborsSpecificCell(CellState[][] grid, int row, int col, CellState target) {
+        int cellCount = 0;
         for (Cell cell : getNeighbors(row, col)) {
-            if (grid[cell.row][cell.col] == CellState.BLACK) {
-                blackCount++;
+            if (grid[cell.row][cell.col] == target) {
+                cellCount++;
             }
         }
-        return blackCount;
+        return cellCount;
     }
 
     public void printSolution(boolean[] kromosom) {

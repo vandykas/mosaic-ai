@@ -33,8 +33,8 @@ public class Populasi {
     }
 
     public Populasi initPopulasiWithElitism(double elitismRate) {
-        int elitismCount = (int) (maxPopulationSize * elitismRate);
         Populasi nextPop = new Populasi(maxPopulationSize, mosaic, random);
+        int elitismCount = (int) (maxPopulationSize * elitismRate);
         for (int i = 0; i < elitismCount; i++) {
             nextPop.addIndividu(new Individu(
                     random, mosaic, daftarIndividu.get(i).getKromosom()
