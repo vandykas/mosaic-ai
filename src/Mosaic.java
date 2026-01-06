@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Mosaic {
@@ -28,9 +29,7 @@ public class Mosaic {
 
         this.partialSolution = new CellState[ukuran][ukuran];
         for (int i = 0; i < ukuran; i++) {
-            for (int j = 0; j < ukuran; j++) {
-                partialSolution[i][j] = CellState.UNKNOWN;
-            }
+            Arrays.fill(this.partialSolution[i], CellState.UNKNOWN);
         }
 
         this.numberCell = new ArrayList<>();
@@ -43,30 +42,31 @@ public class Mosaic {
         }
     }
 
+    record Cell(int row, int col) {}
+
+    record NumCell(int row, int col, int value) {}
+
     public int getUnknownCellsSize() {
         return unknownCells.size();
     }
 
-    private static class Cell {
-        int row;
-        int col;
+    private ArrayList<Cell> getNeighbors(int row, int col) {
+        ArrayList<Cell> neighbors = new ArrayList<>();
+        for (int i = 0; i < MOVEROW.length; i++) {
+            int newRow = MOVEROW[i] + row;
+            int newCol = MOVECOL[i] + col;
 
-        public Cell(int row, int col) {
-            this.row = row;
-            this.col = col;
+            if (!isInTheGrid(newRow, newCol)) {
+                continue;
+            }
+
+            neighbors.add(new Cell(newRow, newCol));
         }
+        return neighbors;
     }
 
-    private static class NumCell {
-        int row;
-        int col;
-        int value;
-
-        public NumCell(int row, int col, int value) {
-            this.row = row;
-            this.col = col;
-            this.value = value;
-        }
+    public boolean isInTheGrid(int x, int y) {
+        return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
     }
 
     public void runHeuristic() {
@@ -99,14 +99,9 @@ public class Mosaic {
 
     private boolean checkClue(int row, int col, int curClue) {
         int blackCount = 0, unknownCount = 0;
-        for (int i = 0; i < MOVEROW.length; i++) {
-            int newRow = MOVEROW[i] + row;
-            int newCol = MOVECOL[i] + col;
-            if (!isInTheGrid(newRow, newCol)) {
-                continue;
-            }
-
-            switch (partialSolution[newRow][newCol]) {
+        ArrayList<Cell> neighbors = getNeighbors(row, col);
+        for (Cell cell : neighbors) {
+            switch (partialSolution[cell.row][cell.col]) {
                 case BLACK:
                     blackCount++;
                     break;
@@ -117,38 +112,34 @@ public class Mosaic {
         }
 
         int remainingBlack = curClue - blackCount;
-
-        // Ubah semua ke hitam
-        if (canFilledWithBlack(remainingBlack, unknownCount)) {
-            changeNeighbourColor(row, col, CellState.BLACK);
-            return true;
-        }
-        // Ubah semua ke putih
-        else if (canFilledWithWhite(remainingBlack, unknownCount)) {
-            changeNeighbourColor(row, col, CellState.WHITE);
+        CellState cellState = searchCellColor(remainingBlack, unknownCount);
+        if (cellState != CellState.UNKNOWN) {
+            changeNeighbourColor(neighbors, cellState);
             return true;
         }
         return false;
     }
 
-    private boolean canFilledWithBlack(int remainingBlack, int unknown) {
-        return remainingBlack == unknown && unknown > 0;
+    private CellState searchCellColor(int remainingBlack, int unknownCount) {
+        if (unknownCount == 0) {
+            return CellState.UNKNOWN;
+        }
+
+        if (remainingBlack == 0) {
+            return CellState.WHITE;
+        }
+        else if (remainingBlack == unknownCount) {
+            return CellState.BLACK;
+        }
+        return  CellState.UNKNOWN;
     }
 
-    private boolean canFilledWithWhite(int remainingBlack, int unknown) {
-        return remainingBlack == 0 && unknown > 0;
-    }
-
-    private void changeNeighbourColor(int row, int col, CellState color) {
-        for (int i = 0; i < MOVEROW.length; i++) {
-            int newRow = MOVEROW[i] + row;
-            int newCol = MOVECOL[i] + col;
-            if (!isInTheGrid(newRow, newCol)) {
-                continue;
-            }
-
-            if (partialSolution[newRow][newCol] == CellState.UNKNOWN) {
-                partialSolution[newRow][newCol] = color;
+    private void changeNeighbourColor(ArrayList<Cell> neighbors, CellState color) {
+        for (Cell cell : neighbors) {
+            int row = cell.row;
+            int col = cell.col;
+            if (partialSolution[row][col] == CellState.UNKNOWN) {
+                partialSolution[row][col] = color;
             }
         }
     }
@@ -157,7 +148,7 @@ public class Mosaic {
         CellState[][] gridSolusi = makeSolutionGrid(kromosom);
         int fitness = 0;
         for (NumCell cell : numberCell) {
-            int blackCnt = hitungSelHitamSekitar(gridSolusi, cell.row, cell.col);
+            int blackCnt = countNeighborsBlackCell(gridSolusi, cell.row, cell.col);
             fitness += Math.abs(cell.value - blackCnt);
         }
         return 1.0 / (fitness + 1);
@@ -184,20 +175,14 @@ public class Mosaic {
         return solutionGrid;
     }
 
-    private int hitungSelHitamSekitar(CellState[][] grid, int baris, int kolom) {
+    private int countNeighborsBlackCell(CellState[][] grid, int row, int col) {
         int blackCount = 0;
-        for (int i = 0; i < MOVEROW.length; i++) {
-            int newRow = baris + MOVEROW[i];
-            int newCol = kolom + MOVECOL[i];
-            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == CellState.BLACK) {
+        for (Cell cell : getNeighbors(row, col)) {
+            if (grid[cell.row][cell.col] == CellState.BLACK) {
                 blackCount++;
             }
         }
         return blackCount;
-    }
-
-    public boolean isInTheGrid(int x, int y) {
-        return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
     }
 
     public void printSolution(boolean[] kromosom) {
@@ -229,4 +214,3 @@ public class Mosaic {
         }
     }
 }
-
