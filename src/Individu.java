@@ -19,7 +19,7 @@ public class Individu implements Comparable<Individu> {
         this.mosaic = mosaic;
 
         this.kromosom = new boolean[mosaic.getUnknownCellsSize()];
-        initKromosom();
+        initKromosomWithProbability();
         this.fitness = mosaic.fitnessFunction(kromosom);
     }
 

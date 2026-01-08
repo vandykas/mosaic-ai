@@ -30,16 +30,23 @@ public class GA {
     }
 
     public void run(int repetisi) {
+        Individu bestOverallIndividu = null;
         for (int r = 0; r < repetisi; r++) {
             System.out.println("Repetisi ke-" + (r + 1));
 
             setRandom(r);
             Individu solusiTerbaik = simulate();
+            bestOverallIndividu = (bestOverallIndividu == null) ? solusiTerbaik : compareIndividu(bestOverallIndividu, solusiTerbaik);
 
             System.out.println("Fitness terbaik: " + solusiTerbaik.getFitness());
+            System.out.println("Banyak cell salah: " + (int) (1.0 / solusiTerbaik.getFitness() - 1));
             mosaic.printSolution(solusiTerbaik.getKromosom());
             System.out.println();
         }
+        System.out.println("Fitness terbaik seluruh repetisi: " + bestOverallIndividu.getFitness());
+        System.out.println("Banyak cell salah: " + (int) (1.0 / bestOverallIndividu.getFitness() - 1));
+        mosaic.printSolution(bestOverallIndividu.getKromosom());
+        System.out.println();
     }
 
     private Individu simulate() {
@@ -52,9 +59,7 @@ public class GA {
             Populasi nextPopulation = buatGenerasiBaru(currPopulation);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
-            if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
-                individuTerbaik = terbaikSaatIni;
-            }
+            individuTerbaik = compareIndividu(individuTerbaik, terbaikSaatIni);
 
             riwayatFitnessPopulasi.add(nextPopulation.hitungFitnessRataRata());
             if (generasi >= convergenceWindow) {
@@ -63,6 +68,13 @@ public class GA {
 
             currPopulation = nextPopulation;
             generasi++;
+        }
+        return individuTerbaik;
+    }
+
+    private Individu compareIndividu(Individu individuTerbaik, Individu terbaikSaatIni) {
+        if (terbaikSaatIni.getFitness() > individuTerbaik.getFitness()) {
+            return terbaikSaatIni;
         }
         return individuTerbaik;
     }
@@ -77,8 +89,8 @@ public class GA {
     private Populasi buatGenerasiBaru(Populasi currPopulation) {
         Populasi nextPopulation = currPopulation.initPopulasiWithElitism(elitismRate);
         while (nextPopulation.getPopulationSize() < maxPopulationSize) {
-            Individu parent1 = currPopulation.seleksiTournament(4);
-            Individu parent2 = currPopulation.seleksiTournament(4);
+            Individu parent1 = currPopulation.seleksiTournament(10);
+            Individu parent2 = currPopulation.seleksiTournament(10);
 
             Individu[] children = parent1.onePointCrossover(parent2);
             children[0].mutasi(mutationRate);

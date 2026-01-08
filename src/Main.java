@@ -48,6 +48,8 @@ public class Main {
             else {
                 mosaic.createUnknownCellsProbability();
                 algoritmaGenetika.run(repetisi);
+                System.out.println("Hasil heuristik single point");
+                System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
                 mosaic.printHeuristicSolution();
             }
         }
