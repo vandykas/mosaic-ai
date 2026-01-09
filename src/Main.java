@@ -14,13 +14,11 @@ public class Main {
         File fileInput = new File(args[1]);
 
         try {
-            // Membaca input puzzle
             Scanner sc = new Scanner(fileInput);
             sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
             mosaic.runHeuristic();
 
-            // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
             GAConfig config = readAndMakeGAConfig(sc);
             sc.close();

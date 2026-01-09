@@ -1,0 +1,1 @@
+record NumCell(int row, int col, int clue) {}
