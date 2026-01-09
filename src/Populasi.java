@@ -26,8 +26,16 @@ public class Populasi {
     }
 
     public void initPopulasi() {
-        for (int i = 0; i < maxPopulationSize; i++) {
+        int individuWithHeuristic = (int) (0.2 * maxPopulationSize);
+        for (int i = 0; i < individuWithHeuristic; i++) {
             Individu individu = new Individu(random, mosaic);
+            individu.initKromosomWithProbability();
+            addIndividu(individu);
+        }
+
+        for (int i = 0; i < maxPopulationSize - individuWithHeuristic; i++) {
+            Individu individu = new Individu(random, mosaic);
+            individu.initKromosom();
             addIndividu(individu);
         }
     }

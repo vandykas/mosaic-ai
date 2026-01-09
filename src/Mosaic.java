@@ -6,7 +6,7 @@ public class Mosaic {
     private final int ukuran;
     private final int[][] clue;
     private final CellState[][] partialSolution;
-    private final List<NumCell> numberCell;
+    private final List<NumCell> numberCells;
     private List<Cell> unknownCells;
     private double[] unknownCellsProb;
 
@@ -23,14 +23,16 @@ public class Mosaic {
             Arrays.fill(this.partialSolution[i], CellState.UNKNOWN);
         }
 
-        this.numberCell = new ArrayList<>();
+        this.numberCells = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 if (clue[i][j] != -1) {
-                    numberCell.add(new NumCell(i, j, clue[i][j]));
+                    numberCells.add(new NumCell(i, j, clue[i][j]));
                 }
             }
         }
+        this.unknownCells = new ArrayList<>();
+        putRemainingUnknownCell();
     }
 
     public int getUnknownCellsSize() {
@@ -42,13 +44,12 @@ public class Mosaic {
     }
 
     public void runHeuristic() {
-        HeuristicSolver heuristicSolver = new HeuristicSolver(numberCell, partialSolution, ukuran);
+        HeuristicSolver heuristicSolver = new HeuristicSolver(numberCells, partialSolution, ukuran);
         heuristicSolver.solve();
         putRemainingUnknownCell();
     }
 
     private void putRemainingUnknownCell() {
-        unknownCells = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 if (partialSolution[i][j] == CellState.UNKNOWN) {
@@ -66,24 +67,23 @@ public class Mosaic {
     }
 
     public double fitnessFunction(boolean[] kromosom) {
-        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
-        int fitness = 0;
-        for (NumCell cell : numberCell) {
-            int blackCnt = GridHelper.countNeighborsSpecificCell(gridSolusi, cell.row(),
-                    cell.col(), CellState.BLACK, ukuran);
-            fitness += Math.abs(cell.clue() - blackCnt);
-        }
-        return 1.0 / (fitness + 1);
+        FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
+        return fitnessCalculator.fitnessFunctionWithScore(kromosom);
     }
 
     public void printSolution(boolean[] kromosom) {
         CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        runHeuristic();
+
+        int diff = 0;
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
+                if (solution[i][j] != partialSolution[i][j]) diff++;
             }
             System.out.println();
         }
+        System.out.println("Total cell beda: " + diff);
     }
 
     public void printHeuristicSolution() {

@@ -17,8 +17,9 @@ public class Main {
             Scanner sc = new Scanner(fileInput);
             sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
-            mosaic.runHeuristic();
+//            mosaic.runHeuristic();
 
+            // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
             GAConfig config = readAndMakeGAConfig(sc);
             sc.close();
@@ -60,11 +61,12 @@ public class Main {
         int maxPopulationSize = sc.nextInt();
         double mutationRate = sc.nextDouble();
         double elitismRate = sc.nextDouble();
+        double crossoverRate = sc.nextDouble();
         int maxGeneration = sc.nextInt();
         double convergenceThreshold = sc.nextDouble();
         int convergenceWindow = sc.nextInt();
         int repetisi = sc.nextInt();
-        return new GAConfig(maxPopulationSize, mutationRate, elitismRate, maxGeneration,
+        return new GAConfig(maxPopulationSize, mutationRate, elitismRate, crossoverRate, maxGeneration,
                 convergenceThreshold, convergenceWindow, repetisi);
     }
 }

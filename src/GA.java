@@ -25,17 +25,11 @@ public class GA {
 
             setRandom(r);
             Individu solusiTerbaik = simulate();
-            bestOverallIndividu = (bestOverallIndividu == null) ? solusiTerbaik : compareIndividu(bestOverallIndividu, solusiTerbaik);
+            printBestIndividu(solusiTerbaik);
 
-            System.out.println("Fitness terbaik: " + solusiTerbaik.getFitness());
-            System.out.println("Banyak cell salah: " + (int) (1.0 / solusiTerbaik.getFitness() - 1));
-            mosaic.printSolution(solusiTerbaik.getKromosom());
-            System.out.println();
+            bestOverallIndividu = (bestOverallIndividu == null) ? solusiTerbaik : compareIndividu(bestOverallIndividu, solusiTerbaik);
         }
-        System.out.println("Fitness terbaik seluruh repetisi: " + bestOverallIndividu.getFitness());
-        System.out.println("Banyak cell salah: " + (int) (1.0 / bestOverallIndividu.getFitness() - 1));
-        mosaic.printSolution(bestOverallIndividu.getKromosom());
-        System.out.println();
+        printBestIndividu(bestOverallIndividu);
     }
 
     private Individu simulate() {
@@ -81,7 +75,15 @@ public class GA {
             Individu parent1 = currPopulation.seleksiTournament(8);
             Individu parent2 = currPopulation.seleksiTournament(8);
 
-            Individu[] children = parent1.onePointCrossover(parent2);
+            Individu[] children = new Individu[2];
+            if (random.nextDouble() < config.crossoverRate()) {
+                children = parent1.twoPointCrossover(parent2);
+            }
+            else {
+                children[0] = new Individu(random, mosaic, parent1.getKromosom());
+                children[1] = new Individu(random, mosaic, parent2.getKromosom());
+            }
+
             children[0].mutasi(config.mutationRate());
             children[1].mutasi(config.mutationRate());
 
@@ -113,5 +115,11 @@ public class GA {
         
         double perbedaan = Math.abs(maxFitness - minFitness);
         return perbedaan <= config.convergenceThreshold();
+    }
+
+    private void printBestIndividu(Individu bestIndividu) {
+        System.out.println("Fitness terbaik: " + bestIndividu.getFitness());
+        mosaic.printSolution(bestIndividu.getKromosom());
+        System.out.println();
     }
 }

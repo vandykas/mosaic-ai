@@ -10,17 +10,14 @@ public class Individu implements Comparable<Individu> {
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
         this.random = random;
         this.mosaic = mosaic;
-        this.fitness = mosaic.fitnessFunction(kromosom);
         this.kromosom = Arrays.copyOf(kromosom, kromosom.length);
+        this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
     public Individu(Random random, Mosaic mosaic) {
         this.random = random;
         this.mosaic = mosaic;
-
         this.kromosom = new boolean[mosaic.getUnknownCellsSize()];
-        initKromosom();
-        this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
     @Override
@@ -40,12 +37,14 @@ public class Individu implements Comparable<Individu> {
         for (int i = 0; i < kromosom.length; i++) {
             kromosom[i] = random.nextDouble() > 0.5;
         }
+        this.fitness =  mosaic.fitnessFunction(kromosom);
     }
 
     public void initKromosomWithProbability() {
         for (int i = 0; i < kromosom.length; i++) {
             kromosom[i] = random.nextDouble() > mosaic.getUnknownCellsProb(i);
         }
+        this.fitness =  mosaic.fitnessFunction(kromosom);
     }
 
     public void mutasi(double mutation_rate) {
