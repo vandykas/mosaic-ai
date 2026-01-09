@@ -5,23 +5,12 @@ import java.util.Random;
 public class GA {
     private final Mosaic mosaic;
     private Random random;
-    private final int maxPopulationSize;
-    private final double mutationRate;
-    private final double elitismRate;
-    private final int maxGeneration;
-    private final double convergenceThreshold;
-    private final int convergenceWindow;
+    private final GAConfig config;
     private List<Double> riwayatFitnessPopulasi;
     
-    public GA(Mosaic mosaic, int maxPopulationSize, double mutationRate, double elitismRate, int maxGeneration,
-              double convergence_threshold, int convergenceWindow) {
+    public GA(Mosaic mosaic, GAConfig config) {
         this.mosaic = mosaic;
-        this.maxPopulationSize = maxPopulationSize;
-        this.mutationRate = mutationRate;
-        this.elitismRate = elitismRate;
-        this.maxGeneration = maxGeneration;
-        this.convergenceThreshold = convergence_threshold;
-        this.convergenceWindow = convergenceWindow;
+        this.config = config;
         this.riwayatFitnessPopulasi = new ArrayList<>();
     }
 
@@ -29,9 +18,9 @@ public class GA {
         this.random = new Random(seed);
     }
 
-    public void run(int repetisi) {
+    public void run() {
         Individu bestOverallIndividu = null;
-        for (int r = 0; r < repetisi; r++) {
+        for (int r = 0; r < config.repetisi(); r++) {
             System.out.println("Repetisi ke-" + (r + 1));
 
             setRandom(r);
@@ -55,14 +44,14 @@ public class GA {
 
         int generasi = 0;
         boolean konvergen = false;
-        while (generasi < maxGeneration && !konvergen) {
+        while (generasi < config.maxGeneration() && !konvergen) {
             Populasi nextPopulation = buatGenerasiBaru(currPopulation);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
             individuTerbaik = compareIndividu(individuTerbaik, terbaikSaatIni);
 
             riwayatFitnessPopulasi.add(nextPopulation.hitungFitnessRataRata());
-            if (generasi >= convergenceWindow) {
+            if (generasi >= config.convergenceWindow()) {
                 konvergen = cekKonvergensi();
             }
 
@@ -80,24 +69,24 @@ public class GA {
     }
 
     private Populasi initPopulasi() {
-        Populasi population = new Populasi(maxPopulationSize, mosaic, random);
+        Populasi population = new Populasi(config.maxPopulationSize(), mosaic, random);
         population.initPopulasi();
         population.sortPopulation();
         return population;
     }
     
     private Populasi buatGenerasiBaru(Populasi currPopulation) {
-        Populasi nextPopulation = currPopulation.initPopulasiWithElitism(elitismRate);
-        while (nextPopulation.getPopulationSize() < maxPopulationSize) {
-            Individu parent1 = currPopulation.seleksiTournament(10);
-            Individu parent2 = currPopulation.seleksiTournament(10);
+        Populasi nextPopulation = currPopulation.initPopulasiWithElitism(config.elitismRate());
+        while (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
+            Individu parent1 = currPopulation.seleksiTournament(8);
+            Individu parent2 = currPopulation.seleksiTournament(8);
 
             Individu[] children = parent1.onePointCrossover(parent2);
-            children[0].mutasi(mutationRate);
-            children[1].mutasi(mutationRate);
+            children[0].mutasi(config.mutationRate());
+            children[1].mutasi(config.mutationRate());
 
             nextPopulation.addIndividu(children[0]);
-            if (nextPopulation.getPopulationSize() < maxPopulationSize) {
+            if (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
                 nextPopulation.addIndividu(children[1]);
             }
         }
@@ -106,11 +95,11 @@ public class GA {
     }
     
     private boolean cekKonvergensi() {
-        if (riwayatFitnessPopulasi.size() < convergenceWindow) {
+        if (riwayatFitnessPopulasi.size() < config.convergenceWindow()) {
             return false;
         }
         
-        int start = riwayatFitnessPopulasi.size() - convergenceWindow;
+        int start = riwayatFitnessPopulasi.size() - config.convergenceWindow();
         int end = riwayatFitnessPopulasi.size();
         
         double maxFitness = Double.NEGATIVE_INFINITY;
@@ -123,6 +112,6 @@ public class GA {
         }
         
         double perbedaan = Math.abs(maxFitness - minFitness);
-        return perbedaan <= convergenceThreshold;
+        return perbedaan <= config.convergenceThreshold();
     }
 }

@@ -149,7 +149,6 @@ public class Mosaic {
         for (int i = 0; i < unknownCount; i++) {
             addClueInfluence(i, unknownCells.get(i).row, unknownCells.get(i).col);
         }
-
         normalize();
     }
 

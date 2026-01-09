@@ -8,21 +8,21 @@ public class Populasi {
     private final Mosaic mosaic;
     private final Random random;
     private final int maxPopulationSize;
-    private final List<Individu> daftarIndividu;
+    private final List<Individu> population;
 
     public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
         this.random = random;
         this.maxPopulationSize = maxPopulationSize;
-        this.daftarIndividu = new ArrayList<>();
+        this.population = new ArrayList<>();
     }
 
     public int getPopulationSize() {
-        return daftarIndividu.size();
+        return population.size();
     }
 
     public Individu getIndividuTerbaik() {
-        return daftarIndividu.get(0);
+        return population.get(0);
     }
 
     public void initPopulasi() {
@@ -37,77 +37,41 @@ public class Populasi {
         int elitismCount = (int) (maxPopulationSize * elitismRate);
         for (int i = 0; i < elitismCount; i++) {
             nextPop.addIndividu(new Individu(
-                    random, mosaic, daftarIndividu.get(i).getKromosom()
+                    random, mosaic, population.get(i).getKromosom()
             ));
         }
         return nextPop;
     }
 
     public void addIndividu(Individu individu) {
-        this.daftarIndividu.add(individu);
+        this.population.add(individu);
     }
 
     public double hitungFitnessRataRata() {
         double total = 0;
-        for (Individu individu : daftarIndividu) {
+        for (Individu individu : population) {
             total += individu.getFitness();
         }
         return total / maxPopulationSize;
     }
     
     public void sortPopulation() {
-        Collections.sort(daftarIndividu);
+        Collections.sort(population);
     }
     
     public Individu seleksiRoulette() {
-        double totalFitness = 0;
-        for (Individu individu : daftarIndividu) {
-            totalFitness += individu.getFitness();
-        }
-        
-        double roda = random.nextDouble() * totalFitness;
-        double total = 0;
-        
-        for (Individu individu : daftarIndividu) {
-            total += individu.getFitness();
-            if (total >= roda) {
-                return individu;
-            }
-        }
-        return daftarIndividu.get(0);
+        SelectionStrategy selectionStrategy = new SelectionStrategy(random, population);
+        return selectionStrategy.seleksiRoulette();
     }
     
     public Individu seleksiRank() {
-        int n = daftarIndividu.size();
-        
-        double totalRank = n * (n + 1) / 2.0;
-        double roda = random.nextDouble() * totalRank;
-
-        double total = 0;
-        for (int i = 0; i < n; i++) {
-            int rank = n - i;
-            total += rank;
-            if (total >= roda) {
-                return daftarIndividu.get(i);
-            }
-        }
-        return daftarIndividu.get(0);
+        SelectionStrategy selectionStrategy = new SelectionStrategy(random, population);
+        return selectionStrategy.seleksiRank();
     }
     
     public Individu seleksiTournament(int ukuranTurnamen) {
-        Individu terbaik = null;
-        double fitnessTerbaik = Double.NEGATIVE_INFINITY;
-        
-        for (int i = 0; i < ukuranTurnamen; i++) {
-            int indeks = random.nextInt(daftarIndividu.size());
-            Individu kandidat = daftarIndividu.get(indeks);
-            
-            if (kandidat.getFitness() > fitnessTerbaik) {
-                fitnessTerbaik = kandidat.getFitness();
-                terbaik = kandidat;
-            }
-        }
-        return terbaik;
+        SelectionStrategy selectionStrategy = new SelectionStrategy(random, population);
+        return selectionStrategy.seleksiTournament(ukuranTurnamen);
     }
     
 }

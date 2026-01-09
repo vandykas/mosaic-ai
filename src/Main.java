@@ -22,23 +22,12 @@ public class Main {
 
             // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
-            int maxPopulationSize = sc.nextInt();
-            double mutationRate = sc.nextDouble();
-            double elitismRate = sc.nextDouble();
-            int maxGeneration = sc.nextInt();
-            double convergenceThreshold = sc.nextDouble();
-            int convergenceWindow = sc.nextInt();
-            int repetisi = sc.nextInt();
+            GAConfig config = readAndMakeGAConfig(sc);
             sc.close();
 
             GA algoritmaGenetika = new GA(
                     mosaic,
-                    maxPopulationSize,
-                    mutationRate,
-                    elitismRate,
-                    maxGeneration,
-                    convergenceThreshold,
-                    convergenceWindow
+                    config
             );
 
             if (mosaic.getUnknownCellsSize() == 0) {
@@ -47,7 +36,7 @@ public class Main {
             }
             else {
                 mosaic.createUnknownCellsProbability();
-                algoritmaGenetika.run(repetisi);
+                algoritmaGenetika.run();
                 System.out.println("Hasil heuristik single point");
                 System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
                 mosaic.printHeuristicSolution();
@@ -67,5 +56,17 @@ public class Main {
             }
         }
         return new Mosaic(ukuranGrid, clue);
+    }
+
+    private static GAConfig readAndMakeGAConfig(Scanner sc) {
+        int maxPopulationSize = sc.nextInt();
+        double mutationRate = sc.nextDouble();
+        double elitismRate = sc.nextDouble();
+        int maxGeneration = sc.nextInt();
+        double convergenceThreshold = sc.nextDouble();
+        int convergenceWindow = sc.nextInt();
+        int repetisi = sc.nextInt();
+        return new GAConfig(maxPopulationSize, mutationRate, elitismRate, maxGeneration,
+                convergenceThreshold, convergenceWindow, repetisi);
     }
 }

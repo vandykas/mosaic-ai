@@ -19,7 +19,7 @@ public class Individu implements Comparable<Individu> {
         this.mosaic = mosaic;
 
         this.kromosom = new boolean[mosaic.getUnknownCellsSize()];
-        initKromosomWithProbability();
+        initKromosom();
         this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
@@ -58,55 +58,17 @@ public class Individu implements Comparable<Individu> {
     }
     
     public Individu[] onePointCrossover(Individu pasangan) {
-        boolean[] child1 = kromosom.clone();
-        boolean[] child2 = pasangan.getKromosom().clone();
-
-        int chromosomeLength = kromosom.length;
-        int crossoverPoint = random.nextInt(chromosomeLength);
-
-        for (int i = crossoverPoint; i < chromosomeLength; i++) {
-            boolean temp = child1[i];
-            child1[i] = child2[i];
-            child2[i] = temp;
-        }
-
-        return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
+        CrossoverStrategy crossoverStrategy = new CrossoverStrategy(random, mosaic);
+        return crossoverStrategy.onePointCrossover(this.kromosom, pasangan.getKromosom());
     }
 
     public Individu[] twoPointCrossover(Individu pasangan) {
-        boolean[] child1 = kromosom.clone();
-        boolean[] child2 = pasangan.getKromosom().clone();
-
-        int chromosomeLength = kromosom.length;
-
-        int crossoverPoint1 = random.nextInt(chromosomeLength);
-        int crossoverPoint2;
-        do {
-            crossoverPoint2 = random.nextInt(chromosomeLength);
-        }
-        while (crossoverPoint1 == crossoverPoint2);
-
-        for (int i = Math.min(crossoverPoint1, crossoverPoint2); i < Math.max(crossoverPoint1, crossoverPoint2) ; i++) {
-            boolean temp = child1[i];
-            child1[i] = child2[i];
-            child2[i] = temp;
-        }
-
-        return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
+        CrossoverStrategy crossoverStrategy = new CrossoverStrategy(random, mosaic);
+        return crossoverStrategy.twoPointCrossover(this.kromosom, pasangan.getKromosom());
     }
 
     public Individu[] uniformCrossover(Individu pasangan) {
-        boolean[] child1 = kromosom.clone();
-        boolean[] child2 = pasangan.getKromosom().clone();
-
-        for (int i = 0; i < kromosom.length; i++) {
-            if (random.nextDouble() < 0.5) {
-                boolean temp = child1[i];
-                child1[i] = child2[i];
-                child2[i] = temp;
-            }
-        }
-
-        return new Individu[]{new Individu(random, mosaic, child1), new Individu(random, mosaic, child2)};
+        CrossoverStrategy crossoverStrategy = new CrossoverStrategy(random, mosaic);
+        return crossoverStrategy.uniformCrossover(this.kromosom, pasangan.getKromosom());
     }
 }
