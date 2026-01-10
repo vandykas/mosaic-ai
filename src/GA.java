@@ -65,6 +65,7 @@ public class GA {
     private Populasi initPopulasi() {
         Populasi population = new Populasi(config.maxPopulationSize(), mosaic, random);
         population.initPopulasi();
+        population.calculatePopulationFitness();
         population.sortPopulation();
         return population;
     }
@@ -77,21 +78,17 @@ public class GA {
 
             Individu[] children = new Individu[2];
             if (random.nextDouble() < config.crossoverRate()) {
-                children = parent1.twoPointCrossover(parent2);
-            }
-            else {
-                children[0] = new Individu(random, mosaic, parent1.getKromosom());
-                children[1] = new Individu(random, mosaic, parent2.getKromosom());
-            }
+                children = parent1.onePointCrossover(parent2);
+                children[0].mutasi(config.mutationRate());
+                children[1].mutasi(config.mutationRate());
 
-            children[0].mutasi(config.mutationRate());
-            children[1].mutasi(config.mutationRate());
-
-            nextPopulation.addIndividu(children[0]);
-            if (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
-                nextPopulation.addIndividu(children[1]);
+                nextPopulation.addIndividu(children[0]);
+                if (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
+                    nextPopulation.addIndividu(children[1]);
+                }
             }
         }
+        nextPopulation.calculatePopulationFitness();
         nextPopulation.sortPopulation();
         return nextPopulation;
     }

@@ -15,13 +15,39 @@ public class FitnessCalculator {
 
     public double fitnessFunctionNoReward(boolean[] kromosom) {
         CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
-        int error = 0;
+        int totalError = 0;
         for (NumCell cell : numberCells) {
             int blackCnt = GridHelper.countNeighborsSpecificCell(gridSolusi, cell.row(),
                     cell.col(), CellState.BLACK, ukuran);
-            error += Math.abs(cell.clue() - blackCnt);
+            int error = Math.abs(cell.clue() - blackCnt);
+            totalError += error * error;
         }
-        return 1.0 / (error + 1);
+        return 1.0 / (totalError + 1);
+    }
+
+    public double fitnessFunctionWithReward(boolean[] kromosom) {
+        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        int totalCorrect = 0;
+        int totalError = 0;
+        for (NumCell cell : numberCells) {
+            int blackCnt = GridHelper.countNeighborsSpecificCell(gridSolusi, cell.row(),
+                    cell.col(), CellState.BLACK, ukuran);
+
+            int error = Math.abs(cell.clue() - blackCnt);
+            if (error == 0) {
+                totalCorrect++;
+            }
+            else {
+                totalError += error * error;
+            }
+        }
+
+        int clueCount = numberCells.size();
+        double penalty = totalError / (clueCount * 9.0);
+        double reward = (double) totalCorrect / clueCount;
+
+        double fitness = (reward * 0.3) + ((1.0 + penalty) * 0.7);
+        return Math.max(0.0, Math.min(1.0, fitness));
     }
 
     public double fitnessFunctionWithScore(boolean[] kromosom) {

@@ -11,7 +11,6 @@ public class Individu implements Comparable<Individu> {
         this.random = random;
         this.mosaic = mosaic;
         this.kromosom = Arrays.copyOf(kromosom, kromosom.length);
-        this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
     public Individu(Random random, Mosaic mosaic) {
@@ -29,6 +28,10 @@ public class Individu implements Comparable<Individu> {
         return this.kromosom;
     }
 
+    public void calculateFitness() {
+        this.fitness = mosaic.fitnessFunction(kromosom);
+    }
+
     public double getFitness() {
         return fitness;
     }
@@ -37,14 +40,12 @@ public class Individu implements Comparable<Individu> {
         for (int i = 0; i < kromosom.length; i++) {
             kromosom[i] = random.nextDouble() > 0.5;
         }
-        this.fitness =  mosaic.fitnessFunction(kromosom);
     }
 
     public void initKromosomWithProbability() {
         for (int i = 0; i < kromosom.length; i++) {
             kromosom[i] = random.nextDouble() > mosaic.getUnknownCellsProb(i);
         }
-        this.fitness =  mosaic.fitnessFunction(kromosom);
     }
 
     public void mutasi(double mutation_rate) {
@@ -53,7 +54,6 @@ public class Individu implements Comparable<Individu> {
                 kromosom[i] = !kromosom[i];
             }
         }
-        this.fitness = mosaic.fitnessFunction(kromosom);
     }
     
     public Individu[] onePointCrossover(Individu pasangan) {

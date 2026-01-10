@@ -32,7 +32,6 @@ public class Mosaic {
             }
         }
         this.unknownCells = new ArrayList<>();
-        putRemainingUnknownCell();
     }
 
     public int getUnknownCellsSize() {
@@ -68,22 +67,17 @@ public class Mosaic {
 
     public double fitnessFunction(boolean[] kromosom) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
-        return fitnessCalculator.fitnessFunctionWithScore(kromosom);
+        return fitnessCalculator.fitnessFunctionNoReward(kromosom);
     }
 
     public void printSolution(boolean[] kromosom) {
         CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
-        runHeuristic();
-
-        int diff = 0;
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
-                if (solution[i][j] != partialSolution[i][j]) diff++;
             }
             System.out.println();
         }
-        System.out.println("Total cell beda: " + diff);
     }
 
     public void printHeuristicSolution() {

@@ -55,6 +55,12 @@ public class Populasi {
         this.population.add(individu);
     }
 
+    public void calculatePopulationFitness() {
+        for (Individu individu : population) {
+            individu.calculateFitness();
+        }
+    }
+
     public double hitungFitnessRataRata() {
         double total = 0;
         for (Individu individu : population) {

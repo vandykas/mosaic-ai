@@ -17,17 +17,14 @@ public class Main {
             Scanner sc = new Scanner(fileInput);
             sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
-//            mosaic.runHeuristic();
+            mosaic.runHeuristic();
 
             // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
             GAConfig config = readAndMakeGAConfig(sc);
             sc.close();
 
-            GA algoritmaGenetika = new GA(
-                    mosaic,
-                    config
-            );
+            GA algoritmaGenetika = new GA(mosaic, config);
 
             if (mosaic.getUnknownCellsSize() == 0) {
                 System.out.println("Diselesaikan heuristic");
