@@ -1,16 +1,15 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Mosaic {
-    private int ukuran;
-    private int[][] clue;
-    private List<NumCell> numberCell;
+    private final int ukuran;
+    private final int[][] clue;
+    private final CellState[][] partialSolution;
+    private final List<NumCell> numberCells;
+    private List<Cell> unknownCells;
+    private double[] unknownCellsProb;
 
-    /**
-     * Konstruktor untuk membuat objek Mosaic
-     * @param ukuran Ukuran grid (n x n)
-     * @param clue Grid berisi angka clue
-     */
     public Mosaic(int ukuran, int[][] clue) {
         this.ukuran = ukuran;
         this.clue = new int[ukuran][ukuran];
@@ -19,70 +18,84 @@ public class Mosaic {
             System.arraycopy(clue[i], 0, this.clue[i], 0, ukuran);
         }
 
-        this.numberCell = new ArrayList<NumCell>();
+        this.partialSolution = new CellState[ukuran][ukuran];
+        for (int i = 0; i < ukuran; i++) {
+            Arrays.fill(this.partialSolution[i], CellState.UNKNOWN);
+        }
+
+        this.numberCells = new ArrayList<>();
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 if (clue[i][j] != -1) {
-                    numberCell.add(new NumCell(i, j, clue[i][j]));
+                    numberCells.add(new NumCell(i, j, clue[i][j]));
+                }
+            }
+        }
+        this.unknownCells = new ArrayList<>();
+    }
+
+    public int getUnknownCellsSize() {
+        return unknownCells.size();
+    }
+
+    public double getUnknownCellsProb(int idx) {
+        return unknownCellsProb[idx];
+    }
+
+    public void runHeuristic() {
+        HeuristicSolver heuristicSolver = new HeuristicSolver(numberCells, partialSolution, ukuran);
+        heuristicSolver.solve();
+        putRemainingUnknownCell();
+    }
+
+    private void putRemainingUnknownCell() {
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                if (partialSolution[i][j] == CellState.UNKNOWN) {
+                    unknownCells.add(new Cell(i, j));
                 }
             }
         }
     }
 
-    private static class NumCell {
-        int row;
-        int col;
-        Integer value;
-
-        public NumCell(int row, int col, Integer value) {
-            this.row = row;
-            this.col = col;
-            this.value = value;
-        }
+    public void createUnknownCellsProbability() {
+        ProbabilityCalculator probabilityCalculator = new ProbabilityCalculator(
+                ukuran, unknownCells, partialSolution, clue
+        );
+        this.unknownCellsProb = probabilityCalculator.calculateProbability();
     }
 
-    public int fitnessFunction(int[][] gridSolusi) {
-        int fitness = 0;
-        for (NumCell numCell : numberCell) {
-            int curRow = numCell.row, curCol = numCell.col;
-            int blackCnt = hitungSelHitamSekitar(gridSolusi, curRow, curCol);
-            fitness += Math.abs(numCell.value - blackCnt);
-        }
-        return -fitness;
+    public double fitnessFunction(boolean[] kromosom) {
+        FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
+        return fitnessCalculator.fitnessFunctionNoReward(kromosom);
     }
 
-    /**
-     * Menghitung jumlah sel hitam di sekitar sel (termasuk sel itu sendiri)
-     * @param grid Grid solusi
-     * @param baris Posisi baris
-     * @param kolom Posisi kolom
-     * @return Jumlah sel hitam di sekitarnya
-     */
-    private int hitungSelHitamSekitar(int[][] grid, int baris, int kolom) {
-        // Pergerakan untuk ke 8 arah sekitar cell tambah cell itu sendiri
-        int[] moveRow = {0, -1, -1, 0, 1, 1, 1, 0, -1};
-        int[] moveCol = {0, 0, 1, 1, 1, 0, -1, -1, -1};
-
-        int hitung = 0;
-        for (int i = 0; i < moveRow.length; i++) {
-            int newRow = baris + moveRow[i];
-            int newCol = kolom + moveCol[i];
-            if (isInTheGrid(newRow, newCol) && grid[newRow][newCol] == 1) {
-                hitung++;
+    public void printSolution(boolean[] kromosom) {
+        CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
             }
+            System.out.println();
         }
-        return hitung;
     }
 
-    public int getUkuran() {
-        return ukuran;
-    }
-
-    public int[][] getclue() {
-        return clue;
-    }
-
-    public boolean isInTheGrid(int x, int y) {
-        return x >= 0 && x < clue.length && y >= 0 && y < clue[0].length;
+    public void printHeuristicSolution() {
+        for (int i = 0; i < ukuran; i++) {
+            for (int j = 0; j < ukuran; j++) {
+                switch (partialSolution[i][j]) {
+                    case BLACK:
+                        System.out.print("H ");
+                        break;
+                    case WHITE:
+                        System.out.print("P ");
+                        break;
+                    default:
+                        System.out.print("U ");
+                        break;
+                }
+            }
+            System.out.println();
+        }
     }
 }
