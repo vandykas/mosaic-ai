@@ -67,17 +67,24 @@ public class Mosaic {
 
     public double fitnessFunction(boolean[] kromosom) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
-        return fitnessCalculator.fitnessFunctionNoReward(kromosom);
+        return fitnessCalculator.fitnessFunctionWithRewardUnweighted(kromosom);
     }
 
     public void printSolution(boolean[] kromosom) {
         CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        int diff = 0;
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
+                if (clue[i][j] != -1) {
+                    if (clue[i][j] != GridHelper.countNeighborsSpecificCell(solution, i, j, CellState.BLACK, ukuran)) {
+                        diff++;
+                    }
+                }
             }
             System.out.println();
         }
+        System.out.println("Banyak clue salah: " + diff);
     }
 
     public void printHeuristicSolution() {

@@ -21,7 +21,7 @@ public class GA {
     public void run() {
         Individu bestOverallIndividu = null;
         for (int r = 0; r < config.repetisi(); r++) {
-            System.out.println("Repetisi ke-" + (r + 1));
+            System.out.println("=== Repetisi ke-" + (r + 1) + " ===");
 
             setRandom(r);
             Individu solusiTerbaik = simulate();
@@ -29,6 +29,7 @@ public class GA {
 
             bestOverallIndividu = (bestOverallIndividu == null) ? solusiTerbaik : compareIndividu(bestOverallIndividu, solusiTerbaik);
         }
+        System.out.println("=== Individu Terbaik seluruh repetisi ===");
         printBestIndividu(bestOverallIndividu);
     }
 
@@ -73,12 +74,11 @@ public class GA {
     private Populasi buatGenerasiBaru(Populasi currPopulation) {
         Populasi nextPopulation = currPopulation.initPopulasiWithElitism(config.elitismRate());
         while (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
-            Individu parent1 = currPopulation.seleksiTournament(8);
-            Individu parent2 = currPopulation.seleksiTournament(8);
+            Individu parent1 = currPopulation.seleksiTournament(16);
+            Individu parent2 = currPopulation.seleksiTournament(16);
 
-            Individu[] children = new Individu[2];
             if (random.nextDouble() < config.crossoverRate()) {
-                children = parent1.onePointCrossover(parent2);
+                Individu[] children = parent1.uniformCrossover(parent2);
                 children[0].mutasi(config.mutationRate());
                 children[1].mutasi(config.mutationRate());
 
