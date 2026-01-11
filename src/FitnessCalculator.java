@@ -63,14 +63,8 @@ public class FitnessCalculator {
                     cell.col(), CellState.BLACK, ukuran);
             int error = Math.abs(cell.clue() - blackCnt);
 
-            double score = switch (error) {
-                case 0 -> 1.0;
-                case 1 -> 0.7;
-                case 2 -> 0.4;
-                case 3 -> 0.2;
-                default -> 0.1;
-            };
-            totalScore += score * score;
+            double score = Math.exp(-0.5 * error);
+            totalScore += score;
         }
         return totalScore / clueCnt;
     }
