@@ -55,11 +55,11 @@ public class Main {
     }
 
     private static GAConfig readAndMakeGAConfig(Scanner sc) {
+        int maxGeneration = sc.nextInt();
         int maxPopulationSize = sc.nextInt();
         double mutationRate = sc.nextDouble();
         double elitismRate = sc.nextDouble();
         double crossoverRate = sc.nextDouble();
-        int maxGeneration = sc.nextInt();
         double convergenceThreshold = sc.nextDouble();
         int convergenceWindow = sc.nextInt();
         int repetisi = sc.nextInt();

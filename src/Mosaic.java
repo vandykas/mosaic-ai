@@ -67,7 +67,7 @@ public class Mosaic {
 
     public double fitnessFunction(boolean[] kromosom) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
-        return fitnessCalculator.fitnessFunctionWithRewardUnweighted(kromosom);
+        return fitnessCalculator.fitnessFunctionByScore(kromosom);
     }
 
     public void printSolution(boolean[] kromosom) {
