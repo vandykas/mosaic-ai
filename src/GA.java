@@ -40,7 +40,8 @@ public class GA {
         int generasi = 0;
         boolean konvergen = false;
         while (generasi < config.maxGeneration() && !konvergen) {
-            Populasi nextPopulation = buatGenerasiBaru(currPopulation);
+            System.out.println("=== Generasi ke-" + (generasi + 1) + " ===");
+            Populasi nextPopulation = buatGenerasiBaru(currPopulation, generasi);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
             individuTerbaik = compareIndividu(individuTerbaik, terbaikSaatIni);
@@ -65,13 +66,15 @@ public class GA {
 
     private Populasi initPopulasi() {
         Populasi population = new Populasi(config.maxPopulationSize(), mosaic, random);
-        population.initPopulasi();
-        population.calculatePopulationFitness();
+        population.initPopulasi(config.heuristicRate());
+        double alpha = config.alphaStart() * (1.0 - 1.0 / config.maxGeneration());
+        population.calculatePopulationFitnessWithDiversity(alpha);
+//        population.calculatePopulationFitness();
         population.sortPopulation();
         return population;
     }
     
-    private Populasi buatGenerasiBaru(Populasi currPopulation) {
+    private Populasi buatGenerasiBaru(Populasi currPopulation, int generasi) {
         Populasi nextPopulation = currPopulation.initPopulasiWithElitism(config.elitismRate());
         while (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
             Individu parent1 = currPopulation.seleksiTournament(16);
@@ -88,7 +91,10 @@ public class GA {
                 }
             }
         }
-        nextPopulation.calculatePopulationFitness();
+        nextPopulation.fillProbability();
+        double alpha = config.alphaStart() * (1.0 - (double) generasi / config.maxGeneration());
+        nextPopulation.calculatePopulationFitnessWithDiversity(alpha);
+//        nextPopulation.calculatePopulationFitness();
         nextPopulation.sortPopulation();
         return nextPopulation;
     }
@@ -111,6 +117,7 @@ public class GA {
         }
         
         double perbedaan = Math.abs(maxFitness - minFitness);
+        System.out.println(perbedaan);
         return perbedaan <= config.convergenceThreshold();
     }
 

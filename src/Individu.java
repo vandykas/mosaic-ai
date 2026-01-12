@@ -32,6 +32,10 @@ public class Individu implements Comparable<Individu> {
         this.fitness = mosaic.fitnessFunction(kromosom);
     }
 
+    public void calculateFitnessWithDiversity(double alpha, double[] probability) {
+        this.fitness = mosaic.fitnessFunctionWithDiversity(kromosom, probability, alpha);
+    }
+
     public double getFitness() {
         return fitness;
     }

@@ -62,8 +62,10 @@ public class Main {
         double crossoverRate = sc.nextDouble();
         double convergenceThreshold = sc.nextDouble();
         int convergenceWindow = sc.nextInt();
+        double heuristicRate = sc.nextDouble();
+        double alphaStart = sc.nextDouble();
         int repetisi = sc.nextInt();
         return new GAConfig(maxPopulationSize, mutationRate, elitismRate, crossoverRate, maxGeneration,
-                convergenceThreshold, convergenceWindow, repetisi);
+                convergenceThreshold, convergenceWindow, heuristicRate, alphaStart, repetisi);
     }
 }

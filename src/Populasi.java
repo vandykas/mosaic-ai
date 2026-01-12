@@ -9,12 +9,14 @@ public class Populasi {
     private final Random random;
     private final int maxPopulationSize;
     private final List<Individu> population;
+    private final double[] probability;
 
     public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
         this.random = random;
         this.maxPopulationSize = maxPopulationSize;
         this.population = new ArrayList<>();
+        this.probability = new double[mosaic.getUnknownCellsSize()];
     }
 
     public int getPopulationSize() {
@@ -25,8 +27,8 @@ public class Populasi {
         return population.get(0);
     }
 
-    public void initPopulasi() {
-        int individuWithHeuristic = (int) (0.2 * maxPopulationSize);
+    public void initPopulasi(double heuristicRate) {
+        int individuWithHeuristic = (int) (heuristicRate * maxPopulationSize);
         for (int i = 0; i < individuWithHeuristic; i++) {
             Individu individu = new Individu(random, mosaic);
             individu.initKromosomWithProbability();
@@ -51,6 +53,19 @@ public class Populasi {
         return nextPop;
     }
 
+    public void fillProbability() {
+        for (Individu individu : population) {
+            boolean[] kromosom = individu.getKromosom();
+            for (int i = 0; i < kromosom.length; i++) {
+                probability[i] += kromosom[i] ? 1 : 0;
+            }
+        }
+
+        for (int i = 0; i < probability.length; i++) {
+            probability[i] /= maxPopulationSize;
+        }
+    }
+
     public void addIndividu(Individu individu) {
         this.population.add(individu);
     }
@@ -58,6 +73,12 @@ public class Populasi {
     public void calculatePopulationFitness() {
         for (Individu individu : population) {
             individu.calculateFitness();
+        }
+    }
+
+    public void calculatePopulationFitnessWithDiversity(double alpha) {
+        for (Individu individu : population) {
+            individu.calculateFitnessWithDiversity(alpha, probability);
         }
     }
 
