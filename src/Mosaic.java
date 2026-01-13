@@ -67,17 +67,43 @@ public class Mosaic {
 
     public double fitnessFunction(boolean[] kromosom) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
-        return fitnessCalculator.fitnessFunctionNoReward(kromosom);
+        return fitnessCalculator.fitnessFunctionByScore(kromosom);
+    }
+
+    public double fitnessFunctionWithDiversity(boolean[] kromosom, double[] probability, double alpha) {
+        FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
+        double fitness = fitnessCalculator.fitnessFunctionByScore(kromosom);
+        if (fitness == 1.0) {
+            return fitness;
+        }
+
+        double diversity = calculateDiversity(kromosom, probability);
+        return (1 - alpha) * fitness + alpha * diversity;
+    }
+
+    private double calculateDiversity(boolean[] kromosom, double[] probability) {
+        double diversity = 0;
+        for (int i = 0; i < kromosom.length; i++) {
+            diversity += kromosom[i] ? 1 - probability[i] : probability[i];
+        }
+        return diversity / kromosom.length;
     }
 
     public void printSolution(boolean[] kromosom) {
         CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        int diff = 0;
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {
                 System.out.print(solution[i][j] == CellState.WHITE ? "P " : "H ");
+                if (clue[i][j] != -1) {
+                    if (clue[i][j] != GridHelper.countNeighborsSpecificCell(solution, i, j, CellState.BLACK, ukuran)) {
+                        diff++;
+                    }
+                }
             }
             System.out.println();
         }
+        System.out.println("Banyak clue salah: " + diff);
     }
 
     public void printHeuristicSolution() {

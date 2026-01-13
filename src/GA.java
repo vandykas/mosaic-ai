@@ -21,7 +21,7 @@ public class GA {
     public void run() {
         Individu bestOverallIndividu = null;
         for (int r = 0; r < config.repetisi(); r++) {
-            System.out.println("Repetisi ke-" + (r + 1));
+            System.out.println("=== Repetisi ke-" + (r + 1) + " ===");
 
             setRandom(r);
             Individu solusiTerbaik = simulate();
@@ -29,6 +29,7 @@ public class GA {
 
             bestOverallIndividu = (bestOverallIndividu == null) ? solusiTerbaik : compareIndividu(bestOverallIndividu, solusiTerbaik);
         }
+        System.out.println("=== Individu Terbaik seluruh repetisi ===");
         printBestIndividu(bestOverallIndividu);
     }
 
@@ -39,7 +40,8 @@ public class GA {
         int generasi = 0;
         boolean konvergen = false;
         while (generasi < config.maxGeneration() && !konvergen) {
-            Populasi nextPopulation = buatGenerasiBaru(currPopulation);
+            System.out.println("=== Generasi ke-" + (generasi + 1) + " ===");
+            Populasi nextPopulation = buatGenerasiBaru(currPopulation, generasi);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
             individuTerbaik = compareIndividu(individuTerbaik, terbaikSaatIni);
@@ -64,21 +66,22 @@ public class GA {
 
     private Populasi initPopulasi() {
         Populasi population = new Populasi(config.maxPopulationSize(), mosaic, random);
-        population.initPopulasi();
-        population.calculatePopulationFitness();
+        population.initPopulasi(config.heuristicRate());
+        double alpha = config.alphaStart() * (1.0 - 1.0 / config.maxGeneration());
+        population.calculatePopulationFitnessWithDiversity(alpha);
+//        population.calculatePopulationFitness();
         population.sortPopulation();
         return population;
     }
     
-    private Populasi buatGenerasiBaru(Populasi currPopulation) {
+    private Populasi buatGenerasiBaru(Populasi currPopulation, int generasi) {
         Populasi nextPopulation = currPopulation.initPopulasiWithElitism(config.elitismRate());
         while (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
-            Individu parent1 = currPopulation.seleksiTournament(8);
-            Individu parent2 = currPopulation.seleksiTournament(8);
+            Individu parent1 = currPopulation.seleksiTournament(16);
+            Individu parent2 = currPopulation.seleksiTournament(16);
 
-            Individu[] children = new Individu[2];
             if (random.nextDouble() < config.crossoverRate()) {
-                children = parent1.onePointCrossover(parent2);
+                Individu[] children = parent1.uniformCrossover(parent2);
                 children[0].mutasi(config.mutationRate());
                 children[1].mutasi(config.mutationRate());
 
@@ -88,7 +91,10 @@ public class GA {
                 }
             }
         }
-        nextPopulation.calculatePopulationFitness();
+        nextPopulation.fillProbability();
+        double alpha = config.alphaStart() * (1.0 - (double) generasi / config.maxGeneration());
+        nextPopulation.calculatePopulationFitnessWithDiversity(alpha);
+//        nextPopulation.calculatePopulationFitness();
         nextPopulation.sortPopulation();
         return nextPopulation;
     }
@@ -111,6 +117,7 @@ public class GA {
         }
         
         double perbedaan = Math.abs(maxFitness - minFitness);
+        System.out.println(perbedaan);
         return perbedaan <= config.convergenceThreshold();
     }
 
