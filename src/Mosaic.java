@@ -2,6 +2,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Merepresentasikan papan puzzle Mosaic.
+ * Menyimpan status grid, petunjuk, dan menangani logika untuk penyelesaian heuristik
+ * serta perhitungan fitness untuk Algoritma Genetika.
+ *
+ * @author TODO to be filled
+ */
 public class Mosaic {
     private final int ukuran;
     private final int[][] clue;
@@ -10,6 +17,12 @@ public class Mosaic {
     private List<Cell> unknownCells;
     private double[] unknownCellsProb;
 
+    /**
+     * Membangun papan Mosaic baru.
+     *
+     * @param ukuran Ukuran grid (N x N).
+     * @param clue   Array 2D petunjuk (-1 menunjukkan tidak ada petunjuk).
+     */
     public Mosaic(int ukuran, int[][] clue) {
         this.ukuran = ukuran;
         this.clue = new int[ukuran][ukuran];

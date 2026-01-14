@@ -3,7 +3,21 @@ import java.io.FileNotFoundException;
 import java.util.Locale;
 import java.util.Scanner;
 
+/**
+ * Main Class untuk penyelesai Mosaic AI.
+ * Kelas ini menangani input file, menginisialisasi puzzle dan konfigurasi,
+ * serta mengatur proses penyelesaian menggunakan Heuristik dan Algoritma Genetika.
+ *
+ * @author TODO to be filled
+ */
 public class Main {
+
+    /**
+     * Titik masuk utama aplikasi.
+     * Mengharapkan dua argumen baris perintah: jalur ke file hyperparameter dan jalur ke file input mosaic.
+     *
+     * @param args Argumen baris perintah. args[0] adalah file hyperparam, args[1] adalah file input.
+     */
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("Penggunaan: java Main hyperparam.txt input.txt");

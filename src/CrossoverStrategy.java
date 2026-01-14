@@ -1,9 +1,24 @@
 import java.util.Random;
 
+/**
+ * Mengimplementasikan berbagai strategi crossover untuk Algoritma Genetika.
+ * Digunakan untuk menggabungkan dua kromosom parent untuk menghasilkan keturunan.
+ * <p>
+ * <strong>Catatan:</strong> Beberapa metode crossover (One-Point, Two-Point, Uniform)
+ * tersedia untuk menentukan mana yang menghasilkan konvergensi terbaik.
+ *
+ * @author TODO to be filled
+ */
 public class CrossoverStrategy {
     private final Random random;
     private final Mosaic mosaic;
 
+    /**
+     * Membangun Strategi Crossover baru.
+     *
+     * @param random Generator angka acak.
+     * @param mosaic Instance puzzle (konteks untuk operasi crossover).
+     */
     public CrossoverStrategy(Random random, Mosaic mosaic) {
         this.random = random;
         this.mosaic = mosaic;

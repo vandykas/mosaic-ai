@@ -1,10 +1,25 @@
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Mengimplementasikan berbagai strategi seleksi untuk Algoritma Genetika.
+ * Digunakan untuk memilih parents untuk generasi berikutnya berdasarkan fitness.
+ * <p>
+ * <strong>Catatan:</strong> Berbagai strategi seleksi (Roulette, Rank, Tournament)
+ * disediakan untuk eksperimen, menemukan yang paling efektif.
+ *
+ * @author TODO to be filled
+ */
 public class SelectionStrategy {
     private final Random random;
     private final List<Individu> population;
 
+    /**
+     * Membangun Strategi Seleksi baru.
+     *
+     * @param random     Generator angka acak.
+     * @param population Populasi saat ini untuk dipilih.
+     */
     public SelectionStrategy(Random random, List<Individu> population) {
         this.random = random;
         this.population = population;
