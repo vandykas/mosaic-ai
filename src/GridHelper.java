@@ -6,22 +6,22 @@ import java.util.List;
  * Menangani pencarian tetangga, pengecekan batas, dan konversi representasi kromosom
  * ke status grid sebenarnya.
  *
- * @author TODO to be filled
+ * @author Vandyka
  */
 public class GridHelper {
     /*
      * Array ini merepresentasikan offset (pergeseran) relatif dari titik pusat
      * (0,0) untuk mengunjungi 9 sel grid 3x3.
      * Pasangan (MOVEROW[i], MOVECOL[i]) adalah sebagai berikut:
-     * Indeks 0: ( 0, 0) -> Sel itu sendiri (Center)
-     * Indeks 1: (-1, 0) -> Atas (Up)
-     * Indeks 2: (-1, 1) -> Atas-Kanan (Up-Right)
-     * Indeks 3: ( 0, 1) -> Kanan (Right)
-     * Indeks 4: ( 1, 1) -> Bawah-Kanan (Down-Right)
-     * Indeks 5: ( 1, 0) -> Bawah (Down)
-     * Indeks 6: ( 1, -1) -> Bawah-Kiri (Down-Left)
-     * Indeks 7: ( 0, -1) -> Kiri (Left)
-     * Indeks 8: (-1, -1) -> Atas-Kiri (Up-Left)
+     * Indeks 0: (0, 0) -> Sel itu sendiri
+     * Indeks 1: (-1, 0) -> Atas
+     * Indeks 2: (-1, 1) -> Atas-Kanan
+     * Indeks 3: (0, 1) -> Kanan
+     * Indeks 4: (1, 1) -> Bawah-Kanan
+     * Indeks 5: (1, 0) -> Bawah
+     * Indeks 6: (1, -1) -> Bawah-Kiri
+     * Indeks 7: (0, -1) -> Kiri
+     * Indeks 8: (-1, -1) -> Atas-Kiri
      */
     private static final int[] MOVEROW = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
     private static final int[] MOVECOL = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
