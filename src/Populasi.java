@@ -44,12 +44,14 @@ public class Populasi {
         int individuWithHeuristic = (int) (heuristicRate * maxPopulationSize);
         for (int i = 0; i < individuWithHeuristic; i++) {
             Individu individu = new Individu(random, mosaic);
+            individu.initKromosomWithHeuristic();
             individu.initKromosomWithProbability();
             addIndividu(individu);
         }
 
         for (int i = 0; i < maxPopulationSize - individuWithHeuristic; i++) {
             Individu individu = new Individu(random, mosaic);
+            individu.initKromosomWithHeuristic();
             individu.initKromosom();
             addIndividu(individu);
         }
@@ -67,10 +69,12 @@ public class Populasi {
     }
 
     public void fillProbability() {
+        List<Cell> unknownCells = mosaic.getUnknownCells();
         for (Individu individu : population) {
-            boolean[] kromosom = individu.getKromosom();
-            for (int i = 0; i < kromosom.length; i++) {
-                probability[i] += kromosom[i] ? 1 : 0;
+            boolean[][] kromosom = individu.getKromosom();
+            for (int i = 0; i < unknownCells.size(); i++) {
+                Cell cell = unknownCells.get(i);
+                probability[i] += kromosom[cell.row()][cell.col()] ? 1 : 0;
             }
         }
 

@@ -50,7 +50,7 @@ public class FitnessCalculator {
      * @param kromosom Solusi yang akan di nilai oleh fitness
      * @return Nilai fitness dalam rentang (0, 1] dimana 1 adalah solusi sempurna
      */
-    public double fitnessFunctionByError(boolean[] kromosom) {
+    public double fitnessFunctionByError(boolean[][] kromosom) {
         // Membuat grid solusi untuk mempermudah perhitungan tetangga cell hitam
         CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
 
@@ -87,7 +87,7 @@ public class FitnessCalculator {
      * @param kromosom Solusi kandidat yang akan dinilai
      * @return Nilai fitness dalam rentang (0, 1]
      */
-    public double fitnessFunctionByScore(boolean[] kromosom) {
+    public double fitnessFunctionByScore(boolean[][] kromosom) {
         // Membuat grid solusi untuk mempermudah perhitungan tetangga cell hitam
         CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
 

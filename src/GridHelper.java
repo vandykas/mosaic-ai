@@ -56,17 +56,13 @@ public class GridHelper {
         return cellCount;
     }
 
-    public static CellState[][] makeSolutionGrid(boolean[] kromosom, CellState[][] partialSolution, List<Cell> unknownCells) {
+    public static CellState[][] makeSolutionGrid(boolean[][] kromosom, CellState[][] partialSolution, List<Cell> unknownCells) {
         int ukuran = partialSolution.length;
         CellState[][] solutionGrid = new CellState[ukuran][ukuran];
         for (int i = 0; i < ukuran; i++) {
-            System.arraycopy(partialSolution[i], 0, solutionGrid[i], 0, ukuran);
-        }
-
-        for (int i = 0; i < kromosom.length; i++) {
-            int row = unknownCells.get(i).row();
-            int col = unknownCells.get(i).col();
-            solutionGrid[row][col] = kromosom[i] ? CellState.WHITE : CellState.BLACK;
+            for (int j = 0; j < ukuran; j++) {
+                solutionGrid[i][j] = kromosom[i][j] ? CellState.BLACK : CellState.WHITE;
+            }
         }
         return solutionGrid;
     }

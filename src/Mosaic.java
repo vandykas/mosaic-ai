@@ -51,6 +51,18 @@ public class Mosaic {
         return unknownCells.size();
     }
 
+    public int getUkuran() {
+        return ukuran;
+    }
+
+    public List<Cell> getUnknownCells() {
+        return unknownCells;
+    }
+
+    public CellState[][] getPartialSolution() {
+        return partialSolution;
+    }
+
     public double getUnknownCellsProb(int idx) {
         return unknownCellsProb[idx];
     }
@@ -78,12 +90,12 @@ public class Mosaic {
         this.unknownCellsProb = probabilityCalculator.calculateProbability();
     }
 
-    public double fitnessFunction(boolean[] kromosom) {
+    public double fitnessFunction(boolean[][] kromosom) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
         return fitnessCalculator.fitnessFunctionByScore(kromosom);
     }
 
-    public double fitnessFunctionWithDiversity(boolean[] kromosom, double[] probability, double alpha) {
+    public double fitnessFunctionWithDiversity(boolean[][] kromosom, double[] probability, double alpha) {
         FitnessCalculator fitnessCalculator = new FitnessCalculator(ukuran, numberCells, partialSolution, unknownCells);
         double fitness = fitnessCalculator.fitnessFunctionByScore(kromosom);
         if (fitness == 1.0) {
@@ -94,15 +106,16 @@ public class Mosaic {
         return (1 - alpha) * fitness + alpha * diversity;
     }
 
-    private double calculateDiversity(boolean[] kromosom, double[] probability) {
+    private double calculateDiversity(boolean[][] kromosom, double[] probability) {
         double diversity = 0;
-        for (int i = 0; i < kromosom.length; i++) {
-            diversity += kromosom[i] ? 1 - probability[i] : probability[i];
+        for (int i = 0; i < probability.length; i++) {
+            Cell cell = unknownCells.get(i);
+            diversity += kromosom[cell.row()][cell.col()] ? 1 - probability[i] : probability[i];
         }
-        return diversity / kromosom.length;
+        return diversity / probability.length;
     }
 
-    public void printSolution(boolean[] kromosom) {
+    public void printSolution(boolean[][] kromosom) {
         CellState[][] solution = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
         int diff = 0;
         for (int i = 0; i < ukuran; i++) {

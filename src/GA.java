@@ -75,6 +75,7 @@ public class GA {
         // Inisialisasi populasi awal
         Populasi currPopulation = initPopulasi();
         Individu individuTerbaik = currPopulation.getIndividuTerbaik();
+        printBestIndividu(individuTerbaik);
 
         /*
          * Selama belum konvergen dan belum mencapai maksimum generasi:
@@ -85,7 +86,6 @@ public class GA {
         int generasi = 0;
         boolean konvergen = false;
         while (generasi < config.maxGeneration() && !konvergen) {
-            System.out.println("=== Generasi ke-" + (generasi + 1) + " ===");
             Populasi nextPopulation = buatGenerasiBaru(currPopulation, generasi);
 
             Individu terbaikSaatIni = nextPopulation.getIndividuTerbaik();
@@ -173,7 +173,7 @@ public class GA {
             if (random.nextDouble() < config.crossoverRate()) {
 
                 // Melakukan persilangan kedua parent
-                Individu[] children = parent1.uniformCrossover(parent2);
+                Individu[] children = parent1.rowBasedCrossover(parent2);
 
                 // Anak hasil persilangan mengalami mutasi untuk eksplorasi
                 children[0].mutasi(config.mutationRate());
