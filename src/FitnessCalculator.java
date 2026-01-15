@@ -52,7 +52,7 @@ public class FitnessCalculator {
      */
     public double fitnessFunctionByError(boolean[][] kromosom) {
         // Membuat grid solusi untuk mempermudah perhitungan tetangga cell hitam
-        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom);
 
         /*
          * Untuk setiap clue, cari banyak total cell hitam tetangganya dan cari selisih dengan clue.
@@ -89,7 +89,7 @@ public class FitnessCalculator {
      */
     public double fitnessFunctionByScore(boolean[][] kromosom) {
         // Membuat grid solusi untuk mempermudah perhitungan tetangga cell hitam
-        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom, partialSolution, unknownCells);
+        CellState[][] gridSolusi = GridHelper.makeSolutionGrid(kromosom);
 
         /*
          * Untuk setiap clue, cari absolut error clue lalu konversi menjadi skor

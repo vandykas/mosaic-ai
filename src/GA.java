@@ -75,7 +75,6 @@ public class GA {
         // Inisialisasi populasi awal
         Populasi currPopulation = initPopulasi();
         Individu individuTerbaik = currPopulation.getIndividuTerbaik();
-        printBestIndividu(individuTerbaik);
 
         /*
          * Selama belum konvergen dan belum mencapai maksimum generasi:
@@ -138,7 +137,7 @@ public class GA {
          * generasi bertambah agar tidak eksplorasi terus.
          */
         double alpha = config.alphaStart() * (1.0 - 1.0 / config.maxGeneration());
-        population.fillProbability();
+        population.fillAverage();
         population.calculatePopulationFitnessWithDiversity(alpha);
 //        population.calculatePopulationFitness();
 
@@ -171,9 +170,7 @@ public class GA {
 
             // Persilangan hanya terjadi ketika memenuhi peluang crossover
             if (random.nextDouble() < config.crossoverRate()) {
-
-                // Melakukan persilangan kedua parent
-                Individu[] children = parent1.rowBasedCrossover(parent2);
+                Individu[] children = parent1.subGridBasedCrossover(parent2);
 
                 // Anak hasil persilangan mengalami mutasi untuk eksplorasi
                 children[0].mutasi(config.mutationRate());
@@ -196,7 +193,7 @@ public class GA {
          * Alpha digunakan untuk mengatur bobot bonus diversity dan akan terus berkurang seiring
          * generasi bertambah agar tidak eksplorasi terus.
          */
-        nextPopulation.fillProbability();
+        nextPopulation.fillAverage();
         double alpha = config.alphaStart() * (1.0 - (double) generasi / config.maxGeneration());
         nextPopulation.calculatePopulationFitnessWithDiversity(alpha);
 //        nextPopulation.calculatePopulationFitness();

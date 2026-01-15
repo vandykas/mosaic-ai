@@ -26,6 +26,14 @@ public class GridHelper {
     private static final int[] MOVEROW = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
     private static final int[] MOVECOL = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
 
+    /**
+     * Mencari tetangga (3 x 3) sebuah cell dengan bantuan array pergerakan ke 9 arah.
+     *
+     * @param row Baris cell yang akan dicari tetangganya
+     * @param col Kolom cell yang akan dicari tetangganya
+     * @param gridSize Ukuran board puzzle
+     * @return Mengembalikan array berisi lokasi cell tetangga dari cell parameter
+     */
     public static ArrayList<Cell> getNeighbors(int row, int col, int gridSize) {
         ArrayList<Cell> neighbors = new ArrayList<>();
         for (int i = 0; i < MOVEROW.length; i++) {
@@ -41,10 +49,28 @@ public class GridHelper {
         return neighbors;
     }
 
-    public static boolean isInTheGrid(int x, int y, int gridSize) {
-        return x >= 0 && x < gridSize && y >= 0 && y < gridSize;
+    /**
+     * Membandingkan baris dan kolom dengan ukuran papan untuk mengetahui
+     * jika baris tersebut berada di dalam atau di luar papan.
+     *
+     * @param row Baris untuk dicek
+     * @param col Kolom untuk dicek
+     * @param gridSize Ukuran board puzzle
+     * @return True jika baris dan kolom masuk dalam board selain itu false
+     */
+    public static boolean isInTheGrid(int row, int col, int gridSize) {
+        return row >= 0 && row < gridSize && col >= 0 && col < gridSize;
     }
 
+    /**
+     *
+     * @param grid Board puzzle
+     * @param row Baris cell yang akan dicari banyak warna target di tetangganya
+     * @param col Kolom cell ynag akan dicari banyak warna target di tetangganya
+     * @param target Warna cell target yang ingin dihitung
+     * @param gridSize Ukuran board puzzle
+     * @return
+     */
     public static int countNeighborsSpecificCell(CellState[][] grid, int row, int col,
                                            CellState target, int gridSize) {
         int cellCount = 0;
@@ -56,8 +82,15 @@ public class GridHelper {
         return cellCount;
     }
 
-    public static CellState[][] makeSolutionGrid(boolean[][] kromosom, CellState[][] partialSolution, List<Cell> unknownCells) {
-        int ukuran = partialSolution.length;
+    /**
+     * Mengubah array boolean kromosom menjadi array CellState agar dapat digunakan
+     * di method lainnya.
+     *
+     * @param kromosom Kromosom solusi yang ingin di transformasi
+     * @return Array CellState hasil transformasil kromosom
+     */
+    public static CellState[][] makeSolutionGrid(boolean[][] kromosom) {
+        int ukuran = kromosom.length;
         CellState[][] solutionGrid = new CellState[ukuran][ukuran];
         for (int i = 0; i < ukuran; i++) {
             for (int j = 0; j < ukuran; j++) {

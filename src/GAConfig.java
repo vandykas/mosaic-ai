@@ -14,7 +14,7 @@
  * @param heuristicRate Persentase populasi awal yang diisi dengan solusi heuristik.
  * @param alphaStart Nilai awal untuk pembobotan diversitas dalam fungsi fitness.
  * @param repetisi Jumlah pengulangan seluruh proses GA untuk ketahanan statistik.
- * @author Vandyka
+ * @author Marco, Vandyka
  */
 public record GAConfig(int maxPopulationSize, double mutationRate, double elitismRate, double crossoverRate,
                        int maxGeneration, double convergenceThreshold, int convergenceWindow,

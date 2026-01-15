@@ -8,7 +8,7 @@ import java.util.Scanner;
  * Kelas ini menangani input file, menginisialisasi puzzle dan konfigurasi,
  * serta mengatur proses penyelesaian menggunakan Heuristik dan Algoritma Genetika.
  *
- * @author TODO to be filled
+ * @author Marco, Vandyka
  */
 public class Main {
 
@@ -29,8 +29,10 @@ public class Main {
 
         try {
             Scanner sc = new Scanner(fileInput);
+            // Agar penggunaan titik untuk bilangan real tidak error
             sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
+            // Jalankan heuristik deterministik terlebih dahulu sebelum memulai algoritma genetika
             mosaic.runHeuristic();
 
             // Membaca hyperparameter
@@ -40,11 +42,13 @@ public class Main {
 
             GA algoritmaGenetika = new GA(mosaic, config);
 
+            // Jika heuristik berhasil menyelesaikan, tidak perlu menjalankan algoritma genetika
             if (mosaic.getUnknownCellsSize() == 0) {
                 System.out.println("Diselesaikan heuristic");
                 mosaic.printHeuristicSolution();
             }
             else {
+                // Buat peluang setiap cell hitam untuk heuristik probabilistic
                 mosaic.createUnknownCellsProbability();
                 algoritmaGenetika.run();
                 System.out.println("Hasil heuristik single point");
@@ -57,6 +61,12 @@ public class Main {
         }
     }
 
+    /**
+     * Membaca input papan dan membuat objek Mosaic
+     *
+     * @param sc Scanner untuk mengambil input
+     * @return Objek mosaic yang sudah berisi konfigurasi papan
+     */
     private static Mosaic readAndMakeMosaic(Scanner sc) {
         int ukuranGrid = sc.nextInt();
         int[][] clue = new int[ukuranGrid][ukuranGrid];
@@ -68,6 +78,12 @@ public class Main {
         return new Mosaic(ukuranGrid, clue);
     }
 
+    /**
+     * Membaca hyperparameter untuk algoritma genetika.
+     *
+     * @param sc Scanner untuk mengambil input
+     * @return Konfigurasi hyperparameter algoritma genetika
+     */
     private static GAConfig readAndMakeGAConfig(Scanner sc) {
         int maxGeneration = sc.nextInt();
         int maxPopulationSize = sc.nextInt();

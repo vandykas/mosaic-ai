@@ -8,7 +8,7 @@ import java.util.Random;
  * <strong>Catatan:</strong> Berbagai strategi seleksi (Roulette, Rank, Tournament)
  * disediakan untuk eksperimen, menemukan yang paling efektif.
  *
- * @author TODO to be filled
+ * @author Marco
  */
 public class SelectionStrategy {
     private final Random random;
@@ -17,7 +17,7 @@ public class SelectionStrategy {
     /**
      * Membangun Strategi Seleksi baru.
      *
-     * @param random     Generator angka acak.
+     * @param random Generator angka acak.
      * @param population Populasi saat ini untuk dipilih.
      */
     public SelectionStrategy(Random random, List<Individu> population) {
@@ -25,6 +25,15 @@ public class SelectionStrategy {
         this.population = population;
     }
 
+    /**
+     * Memilih satu individu dari populasi menggunakan strategi seleksi roulette wheel.
+     *
+     * <p>Cara kerja roulette wheel selection adalah setiap individu memiliki peluang
+     * terpilih yang sebanding dengan nilai fitness-nya. Semakin tinggi fitness,
+     * semakin besar bagian individu pada roda roulette.</p>
+     *
+     * @return Individu terpilih dari populasi
+     */
     public Individu seleksiRoulette() {
         double totalFitness = 0;
         for (Individu individu : population) {
@@ -43,6 +52,19 @@ public class SelectionStrategy {
         return population.getFirst();
     }
 
+    /**
+     * Memilih satu individu dari populasi menggunakan strategi seleksi berbasis peringkat (rank).
+     *
+     * <p>Cara kerja rank selection:
+     * <ol>
+     *   <li>Individu diurutkan berdasarkan fitness dari yang terbaik hingga terburuk.</li>
+     *   <li>Setiap individu diberi peluang sebanding dengan rank nya. Individu terbaik memiliki rank tertinggi.</li>
+     *   <li>Proses seleksi mirip roulette wheel, tapi menggunakan rank sebagai pengganti fitness.</li>
+     * </ol>
+     * </p>
+     *
+     * @return Individu terpilih dari populasi
+     */
     public Individu seleksiRank() {
         int n = population.size();
 
@@ -60,6 +82,19 @@ public class SelectionStrategy {
         return population.getFirst();
     }
 
+    /**
+     * Memilih satu individu dari populasi menggunakan strategi seleksi turnamen.
+     *
+     * <p>Cara kerja tournament selection:
+     * <ol>
+     *   <li>Ambil sejumlah individu secara acak sesuai {@code ukuranTurnamen}.</li>
+     *   <li>Bandingkan nilai fitness mereka dan pilih individu dengan fitness tertinggi.</li>
+     * </ol>
+     * </p>
+     *
+     * @param ukuranTurnamen Jumlah individu yang diikutkan dalam satu turnamen
+     * @return Individu terpilih dari turnamen
+     */
     public Individu seleksiTournament(int ukuranTurnamen) {
         Individu terbaik = null;
         double fitnessTerbaik = Double.NEGATIVE_INFINITY;
