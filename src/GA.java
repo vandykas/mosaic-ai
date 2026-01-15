@@ -2,12 +2,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Mesin inti dari Algoritma Genetika.
+ * Mengelola evolusi populasi untuk menyelesaikan puzzle Mosaic.
+ * <p>
+ * Algoritma berlangsung melalui generasi seleksi, crossover, dan mutasi
+ * sampai solusi ditemukan atau jumlah generasi maksimum tercapai.
+ * <p>
+ * <strong>Catatan:</strong> Strategi seleksi dan crossover yang digunakan di sini masih dalam tahap eksperimen.
+ *
+ * @author TODO to be filled
+ */
 public class GA {
     private final Mosaic mosaic;
     private Random random;
     private final GAConfig config;
     private List<Double> riwayatFitnessPopulasi;
-    
+
+    /**
+     * Membangun instance Algoritma Genetika baru.
+     *
+     * @param mosaic Instance puzzle yang akan diselesaikan.
+     * @param config Parameter konfigurasi untuk GA.
+     */
     public GA(Mosaic mosaic, GAConfig config) {
         this.mosaic = mosaic;
         this.config = config;

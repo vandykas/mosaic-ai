@@ -1,18 +1,38 @@
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * Merepresentasikan satu individu (kandidat solusi) dalam populasi.
+ * Setiap individu memiliki kromosom (array boolean) yang merepresentasikan
+ * status (Hitam/Putih) dari sel-sel yang tidak diketahui pada grid Mosaic.
+ *
+ * @author TODO to be filled
+ */
 public class Individu implements Comparable<Individu> {
     private final Random random;
     private final Mosaic mosaic;
     private final boolean[] kromosom;
     private double fitness;
 
+    /**
+     * Membangun individu dengan kromosom tertentu.
+     *
+     * @param random   Generator angka acak.
+     * @param mosaic   Instance puzzle.
+     * @param kromosom Array boolean yang merepresentasikan solusi.
+     */
     public Individu(Random random, Mosaic mosaic, boolean[] kromosom) {
         this.random = random;
         this.mosaic = mosaic;
         this.kromosom = Arrays.copyOf(kromosom, kromosom.length);
     }
 
+    /**
+     * Membangun individu baru dengan kromosom kosong (untuk diinisialisasi nantinya).
+     *
+     * @param random Generator angka acak.
+     * @param mosaic Instance puzzle.
+     */
     public Individu(Random random, Mosaic mosaic) {
         this.random = random;
         this.mosaic = mosaic;

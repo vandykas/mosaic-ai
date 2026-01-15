@@ -1,10 +1,30 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Kelas bantuan untuk operasi berbasis grid.
+ * Menangani pencarian tetangga, pengecekan batas, dan konversi representasi kromosom
+ * ke status grid sebenarnya.
+ *
+ * @author TODO to be filled
+ */
 public class GridHelper {
-    // Pergerakan row dan col ke tetangga termasuk cell itu sendiri
-    private static final int[] MOVEROW = {0, -1, -1, 0, 1, 1, 1, 0, -1};
-    private static final int[] MOVECOL = {0, 0, 1, 1, 1, 0, -1, -1, -1};
+    /*
+     * Array ini merepresentasikan offset (pergeseran) relatif dari titik pusat
+     * (0,0) untuk mengunjungi 9 sel grid 3x3.
+     * Pasangan (MOVEROW[i], MOVECOL[i]) adalah sebagai berikut:
+     * Indeks 0: ( 0, 0) -> Sel itu sendiri (Center)
+     * Indeks 1: (-1, 0) -> Atas (Up)
+     * Indeks 2: (-1, 1) -> Atas-Kanan (Up-Right)
+     * Indeks 3: ( 0, 1) -> Kanan (Right)
+     * Indeks 4: ( 1, 1) -> Bawah-Kanan (Down-Right)
+     * Indeks 5: ( 1, 0) -> Bawah (Down)
+     * Indeks 6: ( 1, -1) -> Bawah-Kiri (Down-Left)
+     * Indeks 7: ( 0, -1) -> Kiri (Left)
+     * Indeks 8: (-1, -1) -> Atas-Kiri (Up-Left)
+     */
+    private static final int[] MOVEROW = { 0, -1, -1, 0, 1, 1, 1, 0, -1 };
+    private static final int[] MOVECOL = { 0, 0, 1, 1, 1, 0, -1, -1, -1 };
 
     public static ArrayList<Cell> getNeighbors(int row, int col, int gridSize) {
         ArrayList<Cell> neighbors = new ArrayList<>();

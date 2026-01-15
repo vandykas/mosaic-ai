@@ -1,9 +1,15 @@
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Mengelola populasi individu untuk Algoritma Genetika.
+ * Menangani inisialisasi, elitisme, pembaruan probabilitas, dan pengurutan berdasarkan fitness.
+ *
+ * @author TODO to be filled
+ */
 public class Populasi {
     private final Mosaic mosaic;
     private final Random random;
@@ -11,6 +17,13 @@ public class Populasi {
     private final List<Individu> population;
     private final double[] probability;
 
+    /**
+     * Membangun Populasi baru.
+     *
+     * @param maxPopulationSize Jumlah maksimum individu yang diizinkan.
+     * @param mosaic            Instance puzzle.
+     * @param random            Generator angka acak.
+     */
     public Populasi(int maxPopulationSize, Mosaic mosaic, Random random) {
         this.mosaic = mosaic;
         this.random = random;

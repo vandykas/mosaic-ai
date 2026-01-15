@@ -1,11 +1,25 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Penyelesai deterministik yang menggunakan logika dasar untuk menyimpulkan status sel.
+ * Mengiterasi petunjuk bernomor dan menerapkan propagasi batasan (constraint propagation)
+ * untuk mengidentifikasi sel yang pasti HITAM (terisi) atau PUTIH (kosong).
+ *
+ * @author TODO to be filled
+ */
 public class HeuristicSolver {
     private final List<NumCell> numberCell;
     private final CellState[][] partialSolution;
     private final int ukuran;
 
+    /**
+     * Membangun HeuristicSolver baru.
+     *
+     * @param numberCell      Daftar semua sel petunjuk bernomor di papan.
+     * @param partialSolution Status grid saat ini (untuk diperbarui).
+     * @param ukuran          Ukuran grid (N x N).
+     */
     public HeuristicSolver(List<NumCell> numberCell, CellState[][] partialSolution, int ukuran) {
         this.numberCell = numberCell;
         this.partialSolution = partialSolution;

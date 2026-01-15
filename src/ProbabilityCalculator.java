@@ -2,12 +2,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Menghitung probabilitas setiap sel yang tidak diketahui (unknown) sebagai HITAM.
+ * Probabilitas dihitung berdasarkan pengaruh petunjuk (clue) di sekitar sel tersebut.
+ *
+ * @author TODO to be filled
+ */
 public class ProbabilityCalculator {
     private final int ukuran;
     private final List<Cell> unknownCells;
     private final CellState[][] partialSolution;
     private final int[][] clue;
 
+    /**
+     * Membangun ProbabilityCalculator baru.
+     *
+     * @param ukuran          Ukuran grid (N x N).
+     * @param unknownCells    Daftar sel yang statusnya belum diketahui.
+     * @param partialSolution Solusi parsial saat ini dari state grid.
+     * @param clue            Array 2D petunjuk di papan.
+     */
     public ProbabilityCalculator(int ukuran, List<Cell> unknownCells, CellState[][] partialSolution, int[][] clue) {
         this.ukuran = ukuran;
         this.unknownCells = unknownCells;

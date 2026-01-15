@@ -1,11 +1,25 @@
 import java.util.List;
 
+/**
+ * Menghitung nilai fitness untuk individu berdasarkan performanya dalam memecahkan puzzle.
+ * Class ini menyediakan metode perhitungan fitness berdasarkan error dan skor.
+ *
+ * @author TODO to be filled
+ */
 public class FitnessCalculator {
     private final int ukuran;
     private final List<NumCell> numberCells;
     private final CellState[][] partialSolution;
     private final List<Cell> unknownCells;
 
+    /**
+     * Membangun FitnessCalculator baru.
+     *
+     * @param ukuran          Ukuran grid (N x N).
+     * @param numberCells     Daftar sel yang memiliki angka petunjuk.
+     * @param partialSolution Solusi parsial saat ini dari state grid.
+     * @param unknownCells    Daftar sel yang statusnya belum diketahui.
+     */
     public FitnessCalculator(int ukuran, List<NumCell> numberCells, CellState[][] partialSolution, List<Cell> unknownCells) {
         this.ukuran = ukuran;
         this.numberCells = numberCells;
