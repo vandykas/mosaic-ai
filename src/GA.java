@@ -52,10 +52,9 @@ public class GA {
      */
     public void run() {
         Individu bestOverallIndividu = null;
+        setRandom(1937591758);
         for (int r = 0; r < config.repetisi(); r++) {
             System.out.println("=== Repetisi ke-" + (r + 1) + " ===");
-
-            setRandom(r);
             Individu solusiTerbaik = simulate();
             printBestIndividu(solusiTerbaik);
 
@@ -165,12 +164,12 @@ public class GA {
         while (nextPopulation.getPopulationSize() < config.maxPopulationSize()) {
 
             // Melakukan seleksi untuk mendapatkan parent yang akan di silangkan
-            Individu parent1 = currPopulation.seleksiTournament(16);
-            Individu parent2 = currPopulation.seleksiTournament(16);
+            Individu parent1 = currPopulation.seleksiTournament(4);
+            Individu parent2 = currPopulation.seleksiTournament(4);
 
             // Persilangan hanya terjadi ketika memenuhi peluang crossover
             if (random.nextDouble() < config.crossoverRate()) {
-                Individu[] children = parent1.subGridBasedCrossover(parent2);
+                Individu[] children = parent1.uniformCrossover(parent2);
 
                 // Anak hasil persilangan mengalami mutasi untuk eksplorasi
                 children[0].mutasi(config.mutationRate());
