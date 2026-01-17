@@ -52,10 +52,10 @@ public class GA {
      */
     public void run() {
         Individu bestOverallIndividu = null;
+        setRandom(1234321);
         for (int r = 0; r < config.repetisi(); r++) {
             System.out.println("=== Repetisi ke-" + (r + 1) + " ===");
 
-            setRandom(r);
             Individu solusiTerbaik = simulate();
             printBestIndividu(solusiTerbaik);
 

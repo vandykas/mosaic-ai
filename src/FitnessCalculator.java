@@ -102,7 +102,7 @@ public class FitnessCalculator {
                     cell.col(), CellState.BLACK, ukuran);
             int error = Math.abs(cell.clue() - blackCnt);
 
-            double score = Math.exp(-0.5 * error);
+            double score = Math.exp(-0.7 * error);
             totalScore += score;
         }
 
