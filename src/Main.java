@@ -50,10 +50,13 @@ public class Main {
             else {
                 // Buat peluang setiap cell hitam untuk heuristik probabilistic
                 mosaic.createUnknownCellsProbability();
+                long start = System.currentTimeMillis();
                 algoritmaGenetika.run();
-                System.out.println("Hasil heuristik single point");
-                System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
-                mosaic.printHeuristicSolution();
+                long end = System.currentTimeMillis();
+                System.out.println("Waktu algoritma GA (dalam detik): " + (end - start) / 1000.0);
+//                System.out.println("Hasil heuristik single point");
+//                System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
+//                mosaic.printHeuristicSolution();
             }
         }
         catch (FileNotFoundException e) {
