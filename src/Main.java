@@ -45,16 +45,16 @@ public class Main {
             GA algoritmaGenetika = new GA(mosaic, config);
 
             // Jika heuristik berhasil menyelesaikan, tidak perlu menjalankan algoritma genetika
-            long start = System.currentTimeMillis();
             if (mosaic.getUnknownCellsSize() == 0) {
                 System.out.println("Diselesaikan heuristic");
                 mosaic.printHeuristicSolution();
             } else {
                 // Buat peluang setiap cell hitam untuk heuristik probabilistic
                 mosaic.createUnknownCellsProbability();
+                long start = System.currentTimeMillis();
                 algoritmaGenetika.run();
                 long end = System.currentTimeMillis();
-                System.out.println("Waktu GA berjalan dalam detik: " + (end - start) / 1000.0);
+                System.out.println("Waktu algoritma GA (dalam detik): " + (end - start) / 1000.0);
 //                System.out.println("Hasil heuristik single point");
 //                System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
 //                mosaic.printHeuristicSolution();

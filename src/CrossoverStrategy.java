@@ -213,7 +213,7 @@ public class CrossoverStrategy {
 
         /*
          * r1 dan c1 merupakan baris dan kolom sudut kiri atas grid sedangkan
-         * r2 dan c2 merupakan baris dan kolom sudukan kanan bawah grid
+         * r2 dan c2 merupakan baris dan kolom sudut kanan bawah grid
          */
         int r1 = random.nextInt(chromosomeLength);
         int r2 = random.nextInt(r1, chromosomeLength);
