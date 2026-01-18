@@ -30,13 +30,14 @@ public class Main {
         try {
             Scanner sc = new Scanner(fileInput);
             // Agar penggunaan titik untuk bilangan real tidak error
-            sc.useLocale(Locale.US);
             Mosaic mosaic = readAndMakeMosaic(sc);
             // Jalankan heuristik deterministik terlebih dahulu sebelum memulai algoritma genetika
             mosaic.runHeuristic();
+//            mosaic.runWithoutHeuristic();
 
             // Membaca hyperparameter
             sc = new Scanner(fileHyperparameter);
+            sc.useLocale(Locale.US);
             GAConfig config = readAndMakeGAConfig(sc);
             sc.close();
 
