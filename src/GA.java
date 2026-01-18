@@ -24,6 +24,9 @@ public class GA {
     /** Riwayat fitness populasi untuk pengecekan konvergensi */
     private List<Double> riwayatFitnessPopulasi;
 
+    /** writer untuk output ke file txt */
+    private PrintWriter outputWriter;
+
     /**
      * Membangun instance Algoritma Genetika baru.
      *
@@ -34,6 +37,11 @@ public class GA {
         this.mosaic = mosaic;
         this.config = config;
         this.riwayatFitnessPopulasi = new ArrayList<>();
+        try {
+            this.outputWriter = new PrintWriter(new FileWriter("output.txt"));
+        } catch (Exception e) {
+            System.out.println("File output.txt error");
+        }
     }
 
     /**
@@ -63,6 +71,8 @@ public class GA {
         }
         System.out.println("=== Individu Terbaik seluruh repetisi ===");
         printBestIndividu(bestOverallIndividu);
+
+        outputWriter.close();
     }
 
     /**
@@ -81,6 +91,10 @@ public class GA {
          * - Buat generasi baru
          * - Cari dan bandingkan individu terbaik generasi baru
          * - Cek konvergen jika sudah mencapai window konvergen
+         *
+         * Sesudah konvergen, riwayat fitness populasi dimasukan ke output.txt
+         * -1 menunjukan riwayat untuk satu repetisi
+         * riwayat di clear() sebelum memulai repetisi baru
          */
         int generasi = 0;
         boolean konvergen = false;
@@ -99,6 +113,12 @@ public class GA {
             currPopulation = nextPopulation;
             generasi++;
         }
+        
+        outputWriter.println("-1");
+        for(Double fitnessPopulasi: riwayatFitnessPopulasi){
+            outputWriter.println(fitnessPopulasi);
+        }
+        riwayatFitnessPopulasi.clear();
         return individuTerbaik;
     }
 
@@ -251,3 +271,4 @@ public class GA {
         System.out.println();
     }
 }
+
