@@ -83,6 +83,13 @@ public class Mosaic {
     }
 
     /**
+     * Menjalankan GA tanpa menggunakan heuristik deterministik.
+     */
+    public void runWithoutHeuristic() {
+        putRemainingUnknownCell();
+    }
+
+    /**
      * Untuk cell yang tidak dapat di isi heuristik deterministik, dimasukkan
      * ke dalam list.
      */
