@@ -51,6 +51,7 @@ public class Mosaic {
             }
         }
         this.unknownCells = new ArrayList<>();
+        // putRemainingUnknownCell();
     }
 
     public int getUnknownCellsSize() {

@@ -31,8 +31,10 @@ public class Main {
             Scanner sc = new Scanner(fileInput);
             // Agar penggunaan titik untuk bilangan real tidak error
             sc.useLocale(Locale.US);
+            
             Mosaic mosaic = readAndMakeMosaic(sc);
             // Jalankan heuristik deterministik terlebih dahulu sebelum memulai algoritma genetika
+            long start = System.currentTimeMillis();
             mosaic.runHeuristic();
 
             // Membaca hyperparameter
@@ -50,14 +52,15 @@ public class Main {
             else {
                 // Buat peluang setiap cell hitam untuk heuristik probabilistic
                 mosaic.createUnknownCellsProbability();
-                long start = System.currentTimeMillis();
+                
                 algoritmaGenetika.run();
-                long end = System.currentTimeMillis();
-                System.out.println("Waktu algoritma GA (dalam detik): " + (end - start) / 1000.0);
-//                System.out.println("Hasil heuristik single point");
-//                System.out.println("Banyak cell unknown: " + mosaic.getUnknownCellsSize());
-//                mosaic.printHeuristicSolution();
+                
+            //    System.out.println("Hasil heuristik single point");
+            //    System.out.println("Banyak cell unknown: " + (400-mosaic.getUnknownCellsSize()));
+            //    mosaic.printHeuristicSolution();
             }
+            long end = System.currentTimeMillis();
+            System.out.println("Waktu algoritma GA (dalam detik): " + (end - start) / 1000.0);
         }
         catch (FileNotFoundException e) {
             System.out.println("File tidak ditemukan: " + e.getMessage());
