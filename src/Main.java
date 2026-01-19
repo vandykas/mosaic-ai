@@ -20,7 +20,8 @@ public class Main {
      */
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Penggunaan: java Main hyperparam.txt input.txt");
+            System.out.println("Penggunaan: Setelah compile, java Main ../inputs/hyperparam.txt ../inputs/inputFile.txt");
+            System.out.println("Kalau error InputMismatchException, coba ganti titik (.) menjadi koma (,) atau sebaliknya pada file hyperparam.txt");
             return;
         }
 
@@ -102,4 +103,6 @@ public class Main {
         return new GAConfig(maxPopulationSize, mutationRate, elitismRate, crossoverRate, maxGeneration,
                 convergenceThreshold, convergenceWindow, heuristicRate, alphaStart, repetisi);
     }
+
 }
+
